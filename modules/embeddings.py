@@ -27,7 +27,3 @@ vector_store = AzureSearch(
     index_name=INDEX_NAME,
     embedding_function=embeddings.embed_query,
 )
-
-# ---------- RETRIEVER ----------
-# Se expone un retriever que permite buscar documentos similares semánticamente
-retriever = vector_store.as_retriever()

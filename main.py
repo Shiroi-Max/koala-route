@@ -12,9 +12,8 @@ Requiere:
 Uso:
     python main.py
 """
-
 from modules.agents import controller_agent
-
+    
 
 def main():
     """
@@ -33,13 +32,14 @@ def main():
             if not user_query:
                 continue  # Ignorar entrada vacía
 
-            respuesta = controller_agent(user_query=user_query)
+            response = controller_agent(user_query=user_query)
 
-            print("\n💬 Respuesta:\n", respuesta, "\n")
+            print("\n💬 Respuesta:\n", response, "\n")
 
     except KeyboardInterrupt:
         print("\n👋 Sesión interrumpida manualmente.")
-
+    except Exception as e:
+        print(f"\n⚠️ Ocurrió un error inesperado: {e}")
 
 if __name__ == "__main__":
     main()

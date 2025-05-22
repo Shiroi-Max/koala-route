@@ -7,7 +7,6 @@ Este módulo expone:
 """
 
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-from langchain_huggingface import HuggingFacePipeline
 from config.config import LLM_MODEL_ID
 
 # ---------- TOKENIZER ----------
@@ -19,20 +18,20 @@ tokenizer = AutoTokenizer.from_pretrained(LLM_MODEL_ID, use_fast=True)
 # - `device_map="auto"` asigna el modelo automáticamente a GPU/CPU según disponibilidad
 # - `torch_dtype="auto"` selecciona automáticamente el tipo de tensor óptimo (ej. float16)
 model = AutoModelForCausalLM.from_pretrained(
-    LLM_MODEL_ID, device_map="auto", torch_dtype="auto"
+    LLM_MODEL_ID, device_map="auto"
 )
 
 # ---------- PIPELINE ----------
-# Se crea un pipeline de generación de texto con sampling y temperatura ajustada
+# Se crea un pipeline de generación de texto
 pipe = pipeline(
     "text-generation",
     model=model,
     tokenizer=tokenizer,
-    max_new_tokens=512,
     temperature=0.7,
-    do_sample=True,
+    max_new_tokens=512,
+    do_sample=True
 )
 
 # ---------- LLM WRAPPER ----------
 # Se envuelve el pipeline en un objeto de LangChain
-llm = HuggingFacePipeline(pipeline=pipe)
+# llm = HuggingFacePipeline(pipeline=pipe)
