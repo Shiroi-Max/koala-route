@@ -3,7 +3,7 @@ name = "rag-llm-project"
 version = "0.1.0"
 description = "Sistema RAG con LangChain, Hugging Face y Azure AI Search"
 authors = [
-    { name = "Maxim Utica Babyak", email = "tu_email@ejemplo.com" }
+    { name = "Maxim Utica Babyak", email = "maxim.ub.contacto@gmail.com" }
 ]
 readme = "README.md"
 requires-python = ">=3.12"
