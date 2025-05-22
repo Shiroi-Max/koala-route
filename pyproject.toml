@@ -22,7 +22,7 @@ dependencies = [
     "azure-identity",
 
     # --- Soporte para LLMs locales con aceleración ---
-    "torch",         # Recomendado instalar con --index-url para CUDA (ver más abajo)
+    "torch",
     "torchvision",
     "torchaudio",
     "accelerate",
