@@ -114,6 +114,7 @@ El archivo debe estar en la carpeta `data/`.
 
 ## 📂 Estructura del proyecto
 
+```arduino
 koalaRoute/
 ├── config/
 │   └── config.py
@@ -135,6 +136,7 @@ koalaRoute/
 ├── pyproject.toml
 ├── .env
 └── README.md
+```
 
 ---
 
