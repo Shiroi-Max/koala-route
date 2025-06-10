@@ -108,7 +108,7 @@ El archivo debe estar en la carpeta `data/`.
 
 ### Eliminar documentos por ID
 ```bash
-    python deleter.py --id <id_documento>
+python deleter.py --id <id_documento>
 ```
 ---
 
