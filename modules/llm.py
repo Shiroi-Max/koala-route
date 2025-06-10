@@ -1,37 +1,35 @@
 """
-Módulo para inicializar el modelo LLM final usado para generación de texto.
+Inicializa el cliente de Azure OpenAI para la generación de respuestas conversacionales.
 
-Este módulo expone:
-- `llm`: un objeto `HuggingFacePipeline` de LangChain que encapsula el modelo LLM
-         cargado desde Hugging Face Transformers, listo para usar en agentes.
+Este módulo realiza lo siguiente:
+- Configura el cliente `AzureOpenAI` con las credenciales y endpoint definidos.
+- Expone una función para generar respuestas usando el modelo desplegado (como GPT-3.5-Turbo).
+- Utiliza el formato ChatML con roles (`system`, `user`, etc.) compatible con Azure OpenAI.
+
+Expone:
+- `call_openai_chat`: función que recibe una lista de mensajes y devuelve una respuesta generada
+  por el modelo configurado en Azure OpenAI.
 """
 
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-from config.config import LLM_MODEL_ID
-
-# ---------- TOKENIZER ----------
-# Se carga el tokenizer asociado al modelo LLM (por ejemplo, Gemma 2B)
-tokenizer = AutoTokenizer.from_pretrained(LLM_MODEL_ID, use_fast=True)
-
-# ---------- MODELO LLM ----------
-# Se carga el modelo de lenguaje para generación causal
-# - `device_map="auto"` asigna el modelo automáticamente a GPU/CPU según disponibilidad
-# - `torch_dtype="auto"` selecciona automáticamente el tipo de tensor óptimo (ej. float16)
-model = AutoModelForCausalLM.from_pretrained(
-    LLM_MODEL_ID, device_map="auto"
+from openai import AzureOpenAI
+from config.config import (
+    AZURE_OPENAI_API_KEY,
+    AZURE_OPENAI_ENDPOINT,
+    AZURE_OPENAI_DEPLOYMENT,
+    MAX_COMPLETION_TOKENS,
 )
 
-# ---------- PIPELINE ----------
-# Se crea un pipeline de generación de texto
-pipe = pipeline(
-    "text-generation",
-    model=model,
-    tokenizer=tokenizer,
-    temperature=0.7,
-    max_new_tokens=512,
-    do_sample=True
+client = AzureOpenAI(
+    api_key=AZURE_OPENAI_API_KEY,
+    api_version="2024-02-15-preview",
+    azure_endpoint=AZURE_OPENAI_ENDPOINT,
 )
 
-# ---------- LLM WRAPPER ----------
-# Se envuelve el pipeline en un objeto de LangChain
-# llm = HuggingFacePipeline(pipeline=pipe)
+deployment_name = AZURE_OPENAI_DEPLOYMENT
+
+
+def call_openai_chat(prompt_messages: list[dict]) -> str:
+    response = client.chat.completions.create(
+        model=deployment_name, messages=prompt_messages, temperature=0.7, max_tokens=MAX_COMPLETION_TOKENS
+    )
+    return response.choices[0].message.content

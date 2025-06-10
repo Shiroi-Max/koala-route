@@ -1,48 +1,68 @@
 [project]
-name = "rag-llm-project"
+name = "koalaroute"
 version = "0.1.0"
 description = "Sistema RAG con LangChain, Hugging Face y Azure AI Search"
 authors = [
-    { name = "Maxim Utica Babyak", email = "maxim.ub.contacto@gmail.com" }
+    { name = "Maxim Utica Babyak", email = "maxim.ub.work@gmail.com" }
 ]
 readme = "README.md"
 requires-python = ">=3.12"
 
 dependencies = [
 
-    # --- LangChain y Hugging Face ---
+    # ===============================
+    # ⚙️ Core: LangChain + LangGraph
+    # ===============================
     "langchain",
-    "langchain-huggingface",
     "langchain_community",
-    "transformers",
-    "tokenizers",
-    "sentence-transformers",
+    "langgraph",
 
-    # --- Azure Cognitive Search ---
-    "azure-search-documents",
-    "azure-identity",
+    # ===============================
+    # 🤖 Modelos y LLMs (Azure OpenAI + Embeddings)
+    # ===============================
+    "openai",                   # Cliente oficial OpenAI/Azure OpenAI
+    "sentence-transformers",   # Embeddings HuggingFace
+    "tiktoken",                # Conteo de tokens
+    "accelerate",              # Gestión automática de dispositivos (GPU/CPU) y ejecución eficiente
 
-    # --- Soporte para LLMs locales con aceleración ---
-    "torch",
-    "torchvision",
-    "torchaudio",
-    "accelerate",
+    # ===============================
+    # 🔍 Azure Cognitive Search
+    # ===============================
+    "azure-search-documents",  # Cliente Azure Search
+    "azure-identity",          # Autenticación Azure
 
-    # --- Similitud y filtrado ---
-    "scikit-learn",
+    # ===============================
+    # 📊 Métricas, similitud y cálculo
+    # ===============================
+    "scikit-learn",            # cosine_similarity
+    "numpy<2.0",               # Compatibilidad con otras libs
 
-    # --- Compatibilidad y entorno ---
-    "numpy<2.0",
-    "ipykernel",
-    "ipywidgets",
+    # ===============================
+    # 🔧 Utilidades generales
+    # ===============================
+    "python-dotenv",           # Variables de entorno
+]
+
+[project.optional-dependencies]
+
+# ===============================
+# 🌐 WebApp y Desarrollo local
+# ===============================
+dev = [
+    "streamlit",               # Interfaz web
+    "ipykernel",               # Jupyter support
+    "ipywidgets"               # Widgets interactivos
 ]
 
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["modules", "config"]
+packages = ["modules", "modules.agents", "modules.graph", "modules.schema", "config", "webapp"]
+
+[tool.setuptools.package-dir]
+"" = "."
 
 [tool.black]
 line-length = 88

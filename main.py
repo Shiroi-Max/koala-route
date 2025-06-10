@@ -1,25 +1,31 @@
 """
-Script principal para interactuar con el sistema RAG + LLM de forma continua.
+Script principal para interactuar con el sistema RAG + LLM de forma continua usando POO y LangGraph.
 
-- Recupera contexto desde Azure Cognitive Search usando embeddings.
-- Genera respuestas con el modelo LLM configurado (ej. Gemma, Mistral, etc.).
+- Recupera contexto desde Azure Cognitive Search usando embeddings (RetrieverAgent).
+- Genera respuestas con el modelo LLM configurado (LLMAgent, ej. Mistral, Gemma...).
+- Orquesta el flujo completo mediante ControllerAgent y LangGraph.
 - Acepta múltiples preguntas consecutivas desde la consola.
 - Finaliza escribiendo 'salir' o presionando Ctrl+C.
 
 Requiere:
-- `controller_agent` desde agents.py
+- modules.graph.graph.build_langgraph_controller_flow
 
 Uso:
     python main.py
 """
-from modules.agents import controller_agent
-    
+
+from modules.graph.graph import build_langgraph_controller_flow
+from modules.schema.state_schema import StateSchema
+
 
 def main():
     """
-    Ejecuta una sesión interactiva para preguntas al sistema RAG.
+    Ejecuta una sesión interactiva usando el grafo LangGraph.
     """
     print("🧠 Sistema RAG + LLM (Escribe 'salir' para terminar)\n")
+
+    # Construir grafo
+    dialogue_manager = build_langgraph_controller_flow()
 
     try:
         while True:
@@ -32,14 +38,17 @@ def main():
             if not user_query:
                 continue  # Ignorar entrada vacía
 
-            response = controller_agent(user_query=user_query)
+            # Ejecutar flujo LangGraph con estado inicial
+            state = StateSchema(input=user_query, response="")
+            result = dialogue_manager.invoke(state)
 
-            print("\n💬 Respuesta:\n", response, "\n")
+            print("\n💬 Respuesta:\n", result.response, "\n")
 
     except KeyboardInterrupt:
         print("\n👋 Sesión interrumpida manualmente.")
     except Exception as e:
         print(f"\n⚠️ Ocurrió un error inesperado: {e}")
+
 
 if __name__ == "__main__":
     main()

@@ -17,7 +17,7 @@ from typing import Optional
 from azure.search.documents import SearchClient
 from azure.core.credentials import AzureKeyCredential
 from config.config import AZURE_SEARCH_ENDPOINT, AZURE_SEARCH_KEY, INDEX_NAME, DOCS_PATH
-from modules.embeddings import vector_store
+from modules.vector import vector_store
 
 
 def upload_txt_document(file_name: str, title: Optional[str] = None):
