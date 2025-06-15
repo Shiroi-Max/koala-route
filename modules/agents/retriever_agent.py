@@ -1,7 +1,9 @@
 from dataclasses import dataclass
+
 from langchain_community.vectorstores import AzureSearch
 from sklearn.metrics.pairwise import cosine_similarity
-from modules.schema.state_schema import StateSchema
+
+from modules.graph.agent_state import AgentState
 
 
 @dataclass
@@ -15,10 +17,10 @@ class RetrieverAgent:
     """
 
     vector_store: AzureSearch
+    similarity_threshold: float = 0.3
+    k: int = 3
 
-    def get_context(
-        self, state: StateSchema, similarity_threshold: float = 0.3, k: int = 3
-    ) -> dict:
+    def get_context(self, state: AgentState) -> AgentState:
         """
         Recupera documentos relevantes para una consulta y los filtra por similitud.
 
@@ -30,14 +32,14 @@ class RetrieverAgent:
         Returns:
             Contexto concatenado de los documentos relevantes o mensaje alternativo.
         """
-        docs = self.vector_store.similarity_search(state.input, k=k)
-        query_embedding = self.vector_store.embedding_function(state.input)
+        docs = self.vector_store.similarity_search(state["input"], k=self.k)
+        query_embedding = self.vector_store.embedding_function(state["input"])
 
         relevant = []
         for doc in docs:
             doc_embedding = self.vector_store.embedding_function(doc.page_content)
             similarity = cosine_similarity([query_embedding], [doc_embedding])[0][0]
-            if similarity >= similarity_threshold:
+            if similarity >= self.similarity_threshold:
                 relevant.append(doc)
 
         if not relevant:
@@ -47,6 +49,5 @@ class RetrieverAgent:
 
         return {
             "response": result,
-            "next_node": "controlador",
             "last_node": "consulta",
         }

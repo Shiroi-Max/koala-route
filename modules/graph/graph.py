@@ -1,10 +1,12 @@
-from langgraph.graph import StateGraph, END
-from modules.agents.retriever_agent import RetrieverAgent
-from modules.agents.llm_agent import LLMAgent
+from typing import Literal
+
+from langgraph.graph import END, StateGraph
+
 from modules.agents.controller_agent import ControllerAgent
+from modules.agents.llm_agent import LLMAgent
+from modules.agents.retriever_agent import RetrieverAgent
+from modules.graph.agent_state import AgentState
 from modules.vector import vector_store
-from modules.llm import pipeline
-from modules.schema.state_schema import StateSchema
 
 
 def build_langgraph_controller_flow() -> StateGraph:
@@ -18,19 +20,38 @@ def build_langgraph_controller_flow() -> StateGraph:
     """
     # Instanciar agentes
     retriever_agent = RetrieverAgent(vector_store)
-    llm_agent = LLMAgent(pipeline)
+    llm_agent = LLMAgent()
     controller = ControllerAgent()
 
-    graph = StateGraph(state_schema=StateSchema)
+    # Instanciar grafo
+    workflow = StateGraph(AgentState)
 
-    graph.add_node("controlador", controller.run)
-    graph.add_node("consulta", retriever_agent.get_context)
-    graph.add_node("llm", llm_agent.generate_response)
+    # Agregar nodos
+    workflow.add_node("controlador", controller.run)
+    workflow.add_node("consulta", retriever_agent.get_context)
+    workflow.add_node("llm", llm_agent.generate_response)
 
-    graph.set_entry_point("controlador")
-    graph.add_edge("controlador", "consulta")
-    graph.add_edge("controlador", "llm")
-    graph.add_edge("consulta", "controlador")
-    graph.add_edge("llm", END)
+    # Definir punto de entrada
+    workflow.set_entry_point("controlador")
 
-    return graph.compile()
+    workflow.add_conditional_edges("controlador", next_node)
+    workflow.add_edge("consulta", "controlador")
+    workflow.add_edge("llm", END)
+
+    return workflow.compile()
+
+
+def next_node(state: AgentState) -> Literal["consulta", "llm"]:
+    """
+    Determina el siguiente nodo a ejecutar basado en el estado actual.
+
+    Args:
+        state: Estado del grafo que contiene la entrada del usuario.
+
+    Returns:
+        str: Nombre del siguiente nodo a ejecutar.
+    """
+    if state.get("last_node") is None:
+        return "consulta"
+
+    return "llm"

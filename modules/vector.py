@@ -8,11 +8,12 @@ Este módulo expone:
 
 from langchain_community.vectorstores import AzureSearch
 from langchain_huggingface import HuggingFaceEmbeddings
+
 from config.config import (
     AZURE_SEARCH_ENDPOINT,
     AZURE_SEARCH_KEY,
-    INDEX_NAME,
     EMBEDDING_MODEL_ID,
+    INDEX_NAME,
 )
 
 # ---------- EMBEDDINGS ----------

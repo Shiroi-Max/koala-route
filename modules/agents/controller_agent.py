@@ -1,6 +1,7 @@
 from dataclasses import dataclass
+
+from modules.graph.agent_state import AgentState
 from modules.prompt_utils import build_chatml_messages
-from modules.schema.state_schema import StateSchema
 
 
 @dataclass
@@ -12,7 +13,7 @@ class ControllerAgent:
         state: Estado del grafo que contiene la entrada del usuario y la respuesta generada.
     """
 
-    def run(self, state: StateSchema) -> dict:
+    def run(self, state: AgentState) -> AgentState:
         """
         Ejecuta el flujo completo: recupera contexto y genera la respuesta.
 
@@ -22,24 +23,15 @@ class ControllerAgent:
         Returns:
             Siguiente nodo a ejecutar
         """
-        response = state.response
-        next_node = None
+        response = state.get("response", "")
 
-        if state.last_node is None:
-            next_node = "consulta"
-        elif state.last_node == "consulta":
-            next_node = "llm"
-
+        if state.get("last_node") == "consulta":
             system_prompt = ""
-            if not state.response:
+            if not response:
                 system_prompt = (
                     "Tu sistema de recuperación no ha encontrado documentos útiles. "
                     "Responde con tu conocimiento general de forma clara, directa y en español."
                 )
-            response = build_chatml_messages(state.input, state.response, system_prompt)
+            response = build_chatml_messages(state["input"], response, system_prompt)
 
-        return {
-            "response": response,
-            "next_node": next_node,
-            "last_node": "controlador",
-        }
+        return {"response": response}

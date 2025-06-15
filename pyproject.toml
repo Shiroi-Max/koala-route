@@ -14,6 +14,7 @@ dependencies = [
     # ⚙️ Core: LangChain + LangGraph
     # ===============================
     "langchain",
+    "langchain_huggingface",
     "langchain_community",
     "langgraph",
 
@@ -41,6 +42,7 @@ dependencies = [
     # 🔧 Utilidades generales
     # ===============================
     "python-dotenv",           # Variables de entorno
+    "pyyaml",
 ]
 
 [project.optional-dependencies]
@@ -59,7 +61,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["modules", "modules.agents", "modules.graph", "modules.schema", "config", "webapp"]
+packages = ["modules", "modules.agents", "modules.graph", "config", "webapp"]
 
 [tool.setuptools.package-dir]
 "" = "."

@@ -1,0 +1,17 @@
+presupuestos:
+  - Económico
+  - Medio
+  - Alto
+
+tipos_viaje:
+  - Individual
+  - Pareja
+  - Familia
+  - Mochilero
+
+intereses:
+  - Naturaleza
+  - Playas
+  - Cultura
+  - Aventura
+  - Gastronomía

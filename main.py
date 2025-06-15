@@ -14,8 +14,8 @@ Uso:
     python main.py
 """
 
+from modules.graph.agent_state import AgentState
 from modules.graph.graph import build_langgraph_controller_flow
-from modules.schema.state_schema import StateSchema
 
 
 def main():
@@ -39,10 +39,10 @@ def main():
                 continue  # Ignorar entrada vacía
 
             # Ejecutar flujo LangGraph con estado inicial
-            state = StateSchema(input=user_query, response="")
+            state = AgentState(input=user_query, response="")
             result = dialogue_manager.invoke(state)
 
-            print("\n💬 Respuesta:\n", result.response, "\n")
+            print("\n💬 Respuesta:\n", result.get("response"), "\n")
 
     except KeyboardInterrupt:
         print("\n👋 Sesión interrumpida manualmente.")

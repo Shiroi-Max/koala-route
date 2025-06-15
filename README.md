@@ -117,13 +117,13 @@ python deleter.py --id <id_documento>
 ```arduino
 koalaRoute/
 ├── config/
-│   └── config.py
+│   ├── config.py
+|   └── ui_options.yaml
 ├── data/
 │   └── info.txt
 ├── modules/
 │   ├── agents/
 │   ├── graph/
-│   ├── schema/
 │   ├── llm.py
 │   ├── prompt_utils.py
 │   └── vector.py

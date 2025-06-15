@@ -2,8 +2,9 @@
 Este módulo contiene utilidades para construir prompts estructurados
 """
 
-from config.config import ENCODING_NAME
 from tiktoken import get_encoding
+
+from config.config import ENCODING_NAME
 
 encoding = get_encoding(ENCODING_NAME)
 

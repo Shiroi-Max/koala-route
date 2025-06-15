@@ -12,16 +12,18 @@ Expone:
 """
 
 from openai import AzureOpenAI
+
 from config.config import (
+    API_VERSION,
     AZURE_OPENAI_API_KEY,
-    AZURE_OPENAI_ENDPOINT,
     AZURE_OPENAI_DEPLOYMENT,
+    AZURE_OPENAI_ENDPOINT,
     MAX_COMPLETION_TOKENS,
 )
 
 client = AzureOpenAI(
     api_key=AZURE_OPENAI_API_KEY,
-    api_version="2024-02-15-preview",
+    api_version=API_VERSION,
     azure_endpoint=AZURE_OPENAI_ENDPOINT,
 )
 
@@ -30,6 +32,9 @@ deployment_name = AZURE_OPENAI_DEPLOYMENT
 
 def call_openai_chat(prompt_messages: list[dict]) -> str:
     response = client.chat.completions.create(
-        model=deployment_name, messages=prompt_messages, temperature=0.7, max_tokens=MAX_COMPLETION_TOKENS
+        model=deployment_name,
+        messages=prompt_messages,
+        temperature=0.7,
+        max_tokens=MAX_COMPLETION_TOKENS,
     )
     return response.choices[0].message.content
