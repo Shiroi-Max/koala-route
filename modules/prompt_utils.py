@@ -2,9 +2,10 @@
 Este módulo contiene utilidades para construir prompts estructurados
 """
 
+import yaml
 from tiktoken import get_encoding
 
-from config.config import ENCODING_NAME
+from config.config import ENCODING_NAME, PROMPT_PATH
 
 encoding = get_encoding(ENCODING_NAME)
 
@@ -13,19 +14,23 @@ def build_chatml_messages(
     user_query: str, context: str = "", system_prompt: str = ""
 ) -> list[dict]:
     """
-    Construye una lista de mensajes en formato ChatML para Mistral 7B Instruct v0.3.
+    Construye una lista de mensajes en formato OpenAI Chat (ChatML)
+    compatibles con modelos como gpt-3.5-turbo o gpt-4.
 
     Args:
         user_query (str): Pregunta del usuario.
-        context (str): Texto del RAG si existe.
-        system_prompt (str): Mensaje de rol del sistema.
+        context (str): Texto del sistema de recuperación (RAG), si existe.
+        system_prompt (str): Instrucciones del sistema (opcional). Si no se proporciona, se usa uno por defecto.
 
     Returns:
-        list[dict]: Mensajes en formato ChatML con roles: system, user.
+        list[dict]: Lista de mensajes con formato role-content esperados por la API de chat OpenAI.
     """
-    messages = []
+
+    full_system_prompt = load_prompt("default_system_prompt")
     if system_prompt:
-        messages.append({"role": "system", "content": system_prompt})
+        full_system_prompt += f"\n\n📝 Instrucciones adicionales:\n{system_prompt}"
+
+    messages = [{"role": "system", "content": full_system_prompt}]
 
     if context:
         user_content = f"Dado el siguiente contexto:\n{context}\n\nResponde a la pregunta:\n{user_query}"
@@ -36,21 +41,42 @@ def build_chatml_messages(
     return messages
 
 
-def count_tokens(messages: list[dict]) -> int:
+def load_prompt(key: str) -> str:
     """
-    Cuenta la cantidad total de tokens en un mensaje tipo ChatML.
+    Carga un prompt del sistema por clave desde el archivo YAML.
 
     Args:
-        messages (list): Lista de mensajes en formato [{"role": ..., "content": ...}]
+        key (str): Clave del prompt a recuperar.
 
     Returns:
-        int: Número total de tokens que se enviarían al modelo.
+        str: Texto del prompt solicitado.
+
+    Raises:
+        KeyError: Si la clave no existe en el archivo.
     """
-    num_tokens = 0
-    for msg in messages:
-        # Cada mensaje lleva tokens fijos + contenido
-        num_tokens += 4  # tokens por role + content + delimitadores
-        for _, value in msg.items():
-            num_tokens += len(encoding.encode(value))
-    num_tokens += 2  # tokens extra para el assistant que sigue
-    return num_tokens
+    with open(PROMPT_PATH, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    if key not in data:
+        raise KeyError(f"❌ Clave de prompt '{key}' no encontrada en {PROMPT_PATH}")
+    return data[key]
+
+
+def load_formatted_prompt(key: str, **kwargs) -> str:
+    """
+    Carga un prompt del YAML y aplica formateo dinámico con kwargs.
+
+    Args:
+        key (str): Clave del prompt.
+        **kwargs: Variables para sustituir en el template.
+
+    Returns:
+        str: Prompt formateado.
+    """
+    with open(PROMPT_PATH, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+
+    template = data.get(key)
+    if not template:
+        raise KeyError(f"❌ Clave '{key}' no encontrada en el YAML.")
+
+    return template.format(**kwargs)

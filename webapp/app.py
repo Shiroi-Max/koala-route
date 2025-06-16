@@ -3,11 +3,11 @@ import streamlit as st
 import yaml
 from langgraph_runner import run_prompt
 
-from config.config import MAX_PROMPT_TOKENS
-from modules.prompt_utils import build_chatml_messages, count_tokens, encoding
+from config.config import MAX_PROMPT_TOKENS, UI_OPTIONS_PATH
+from modules.prompt_utils import encoding, load_formatted_prompt
 
 # Cargar opciones de interfaz desde archivo YAML
-with open("config/ui_options.yaml", "r", encoding="utf-8") as f:
+with open(UI_OPTIONS_PATH, "r", encoding="utf-8") as f:
     ui_options = yaml.safe_load(f)
 
 st.set_page_config(page_title="KoalaRoute", page_icon="🐨", layout="centered")
@@ -38,21 +38,18 @@ with col4:
 
 # Construcción del prompt base
 interest_str = ", ".join(interests) if interests else "cualquier tipo de actividad"
-prompt_base = (
-    f"Eres un planificador de viajes experto en Australia. "
-    f"Quiero un itinerario día a día para un viaje de {days} días, "
-    f"con presupuesto {budget.lower()}, viajando en formato {travel_type.lower()}, "
-    f"centrado en los siguientes intereses: {interest_str}. "
-    f"Detalles adicionales: "
-)
 
-# Tokens del sistema (prompt fijo)
-base_messages = build_chatml_messages(prompt_base)
-base_token_count = count_tokens(base_messages)
+prompt_base = load_formatted_prompt(
+    "prompt_base",
+    days=days,
+    budget=budget.lower(),
+    travel_type=travel_type.lower(),
+    interests={interest_str},
+)
 
 # Tokens del input del usuario
 user_token_count = len(encoding.encode(user_query))
-tokens_remaining = max(MAX_PROMPT_TOKENS - base_token_count, 0)
+tokens_remaining = max(MAX_PROMPT_TOKENS, 0)
 progress_ratio = (
     min(user_token_count / tokens_remaining, 1.0) if tokens_remaining > 0 else 1.0
 )

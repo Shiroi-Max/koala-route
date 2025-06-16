@@ -18,5 +18,5 @@ def run_prompt(user_query: str) -> str:
         return result.get("response")
     except Exception as e:
         print("💥 ERROR ejecutando el grafo:")
-        traceback.print_exc()  # 👈 Esto mostrará el error original
+        traceback.print_exc()
         raise RuntimeError("Fallo en el grafo") from e

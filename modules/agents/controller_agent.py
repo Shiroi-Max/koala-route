@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from modules.graph.agent_state import AgentState
-from modules.prompt_utils import build_chatml_messages
+from modules.prompt_utils import build_chatml_messages, load_prompt
 
 
 @dataclass
@@ -26,12 +26,9 @@ class ControllerAgent:
         response = state.get("response", "")
 
         if state.get("last_node") == "consulta":
-            system_prompt = ""
+            fallback_prompt = ""
             if not response:
-                system_prompt = (
-                    "Tu sistema de recuperación no ha encontrado documentos útiles. "
-                    "Responde con tu conocimiento general de forma clara, directa y en español."
-                )
-            response = build_chatml_messages(state["input"], response, system_prompt)
+                fallback_prompt = load_prompt("fallback_prompt")
+            response = build_chatml_messages(state["input"], response, fallback_prompt)
 
         return {"response": response}
