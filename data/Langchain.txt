@@ -1,3 +1,0 @@
-LangChain es un framework de Python (y también JavaScript) diseñado para facilitar el desarrollo de aplicaciones que integran modelos de lenguaje (LLMs) con fuentes de datos externas (documentos, bases de datos, APIs, etc.) y sistemas de razonamiento o agentes. Su objetivo es permitir que los LLMs hagan más que simplemente responder texto: pueden razonar, buscar información externa y operar con herramientas.
-
-LangChain se usa para construir flujos donde los modelos pueden consultar bases de datos vectoriales (como FAISS, Pinecone, Chroma, Azure Cognitive Search, Weaviate, etc.) para realizar búsquedas semánticas sobre documentos embebidos.

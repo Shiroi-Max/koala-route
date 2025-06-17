@@ -97,18 +97,25 @@ Permite planificar viajes con filtros, duración, presupuesto e intereses.
 ---
 
 ### Subir documentos al índice Azure Cognitive Search
+Los documentos deben estar almacenados en ``DOCS_PATH``, constante definida en ``config.py``
 
 ```bash
 python uploader.py --file info.txt --title "LangChain Overview"
 ```
 
-El archivo debe estar en la carpeta `data/`.
+```bash
+python uploader.py --all
+```
 
 ---
 
-### Eliminar documentos por ID
+### Eliminar documentos
 ```bash
-python deleter.py --id <id_documento>
+python deleter.py --id <id_documento> <id_documento_2> ...
+```
+
+```bash
+python deleter.py --all
 ```
 ---
 
@@ -118,12 +125,18 @@ python deleter.py --id <id_documento>
 koalaRoute/
 ├── config/
 │   ├── config.py
+|   ├── prompts.yaml
 |   └── ui_options.yaml
 ├── data/
-│   └── info.txt
+│   └── template.md
 ├── modules/
 │   ├── agents/
+|   |   ├── controller_agent.py
+|   |   ├── llm_agent.py
+|   |   └── retriever_agent.py
 │   ├── graph/
+|   |   ├── agent_state.py
+|   |   └── graph.py
 │   ├── llm.py
 │   ├── prompt_utils.py
 │   └── vector.py

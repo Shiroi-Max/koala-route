@@ -2,6 +2,7 @@
 Este módulo contiene utilidades para construir prompts estructurados
 """
 
+import re
 import yaml
 from tiktoken import get_encoding
 
@@ -80,3 +81,33 @@ def load_formatted_prompt(key: str, **kwargs) -> str:
         raise KeyError(f"❌ Clave '{key}' no encontrada en el YAML.")
 
     return template.format(**kwargs)
+
+
+def extract_user_interests_from_prompt(
+    prompt_template: str, filled_prompt: str
+) -> list[str]:
+    """
+    Extrae los intereses desde un prompt personalizado y su plantilla.
+
+    Args:
+        prompt_template (str): Plantilla con marcador `{interests}`.
+        filled_prompt (str): Prompt ya formateado con los valores reales.
+
+    Returns:
+        list[str]: Lista de intereses extraídos.
+    """
+    # Escapamos caracteres especiales en la plantilla para usar como regex
+    pattern = re.escape(prompt_template)
+
+    # Reemplazamos el marcador {interests} por un grupo de captura (.*?)
+    pattern = pattern.replace(re.escape("{interests}"), r"(?P<interests>.+?)")
+
+    # Reemplazamos otros marcadores por comodines para que no molesten
+    pattern = re.sub(r"\{[^{}]+\}", r".+?", pattern)
+
+    # Buscamos usando re.DOTALL por si hay saltos de línea
+    match = re.search(pattern, filled_prompt, re.DOTALL)
+    if match:
+        interests_str = match.group("interests")
+        return [i.strip().lower() for i in interests_str.split(",") if i.strip()]
+    return []
