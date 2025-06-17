@@ -1,7 +1,7 @@
 # app.py
 import streamlit as st
 import yaml
-from langgraph_runner import run_prompt
+from webapp.runner import run_prompt
 
 from config.config import MAX_PROMPT_TOKENS, UI_OPTIONS_PATH
 from modules.prompt_utils import encoding, load_formatted_prompt

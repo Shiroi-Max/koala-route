@@ -1,7 +1,7 @@
 [project]
 name = "koalaroute"
 version = "0.1.0"
-description = "Sistema RAG con LangChain, Hugging Face y Azure AI Search"
+description = "Sistema RAG con LangChain, Langgraph, Hugging Face y Azure AI Search"
 authors = [
     { name = "Maxim Utica Babyak", email = "maxim.ub.work@gmail.com" }
 ]
@@ -13,7 +13,6 @@ dependencies = [
     # ===============================
     # ⚙️ Core: LangChain + LangGraph
     # ===============================
-    "langchain",
     "langchain_huggingface",
     "langchain_community",
     "langgraph",
@@ -43,15 +42,19 @@ dependencies = [
     # ===============================
     "python-dotenv",           # Variables de entorno
     "pyyaml",
+
+    # ===============================
+    # 🌐 Webapp
+    # ===============================
+    "streamlit",               # Interfaz web
 ]
 
 [project.optional-dependencies]
 
 # ===============================
-# 🌐 WebApp y Desarrollo local
+# ⚙️ Desarrollo local
 # ===============================
 dev = [
-    "streamlit",               # Interfaz web
     "ipykernel",               # Jupyter support
     "ipywidgets"               # Widgets interactivos
 ]

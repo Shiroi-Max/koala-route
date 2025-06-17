@@ -1,5 +1,4 @@
-# 🧠 RAG + LLM con LangChain, Hugging Face y Azure AI Search
-
+# 🧠 RAG + LLM con LangChain, Langgraph, Hugging Face y Azure AI Search
 Este proyecto implementa un sistema de Recuperación y Generación Aumentada (RAG) que:
 
 - Usa Azure Cognitive Search como base vectorial.  
@@ -21,6 +20,9 @@ Este proyecto implementa un sistema de Recuperación y Generación Aumentada (RA
 - Archivo `.env` configurado con credenciales de Azure
 
 ---
+
+## 📸 Preview
+![alt text](images/preview.png)
 
 ## ⚡ Instalación
 
@@ -50,17 +52,22 @@ python -m venv .venv
 pip install torch --index-url https://download.pytorch.org/whl/cu121
 ```
 
+---
+
 ### 3. Instala el resto de dependencias del proyecto
 
 ```bash
 pip install .
 ```
 
-Si quieres también herramientas de desarrollo y webapp:
+Si quieres también herramientas de desarrollo:
 
 ```bash
 pip install ".[dev]"
 ```
+
+---
+
 ### 4. Crea y configura tu archivo .env
 
 ```ini
@@ -68,23 +75,12 @@ AZURE_SEARCH_ENDPOINT=https://<tu-endpoint>.search.windows.net
 AZURE_SEARCH_KEY=<tu-clave-secreta>
 AZURE_OPENAI_API_KEY=<tu-api-key>
 AZURE_OPENAI_ENDPOINT=https://<openai-endpoint>.openai.azure.com/
-AZURE_OPENAI_DEPLOYMENT=koalaroute-gpt35
+AZURE_OPENAI_DEPLOYMENT=<tu-modelo>
 ```
 
 ---
 
 ## 🧪 Uso
-
-### Ejecutar interfaz por consola
-
-```bash
-python main.py
-```
-
-Puedes hacer preguntas consecutivas al modelo.  
-Escribe `salir` para cerrar la sesión.
-
----
 
 ### Ejecutar interfaz web con Streamlit
 
@@ -109,7 +105,7 @@ python uploader.py --all
 
 ---
 
-### Eliminar documentos
+### Eliminar documentos del índice de Azure Cognitive Search
 ```bash
 python deleter.py --id <id_documento> <id_documento_2> ...
 ```
@@ -142,12 +138,12 @@ koalaRoute/
 │   └── vector.py
 ├── webapp/
 │   ├── app.py
-|   └── langgraph_runner.py 
+|   └── runner.py
 ├── main.py
 ├── uploader.py
 ├── deleter.py
-├── pyproject.toml
 ├── .env
+├── pyproject.toml
 └── README.md
 ```
 
