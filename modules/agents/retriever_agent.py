@@ -1,3 +1,19 @@
+"""
+Agente responsable de recuperar contexto relevante desde un almacén vectorial usando búsqueda por similitud.
+
+Este agente forma parte de la arquitectura RAG (Retrieval-Augmented Generation) y se encarga de:
+- Realizar una búsqueda semántica en Azure Cognitive Search (vía `langchain_community.vectorstores.AzureSearch`).
+- Filtrar los documentos según los intereses del usuario y la sección del contenido.
+- Calcular similitudes con embeddings para aplicar un umbral de relevancia.
+- Devolver las secciones útiles para ser usadas como contexto en la generación de respuestas.
+
+Requiere:
+- `RETRIEVER_K` y `SIMILARITY_THRESHOLD` definidos en `config`.
+- Un vector store que implemente `.similarity_search` y `.embedding_function`.
+- Funciones de `prompt_utils`: `extract_user_interests_from_prompt`, `load_prompt`.
+- Un estado (`AgentState`) que contenga la entrada del usuario en `"input"`.
+"""
+
 from dataclasses import dataclass
 
 from langchain_community.vectorstores import AzureSearch
@@ -17,21 +33,30 @@ class RetrieverAgent:
     Agente responsable de recuperar documentos relevantes desde un almacén vectorial
     según una consulta del usuario y un umbral de similitud.
 
+    Este agente filtra las secciones por interés temático y relevancia semántica antes de
+    entregarlas como contexto al siguiente paso del flujo (por ejemplo, generación con LLM).
+
     Atributos:
-        vector_store: Objeto vectorial con `similarity_search` y `embedding_function`.
+        vector_store (AzureSearch): Almacén vectorial con métodos de búsqueda y embeddings.
     """
 
     vector_store: AzureSearch
 
     def get_context(self, state: AgentState) -> AgentState:
         """
-        Recupera documentos relevantes para una consulta y los filtra por similitud y secciones útiles según los intereses del usuario.
+        Recupera documentos relevantes para una consulta del usuario y filtra los resultados
+        por similitud semántica y coincidencia temática con los intereses extraídos del prompt.
+
+        - Realiza una búsqueda semántica con `similarity_search`.
+        - Filtra secciones cuyo campo `metadata["section"]` coincida con los intereses.
+        - Calcula la similitud con el embedding de la consulta y aplica un umbral.
+        - Devuelve las secciones relevantes en el campo `"response"` del estado.
 
         Args:
-            state (AgentState): Estado actual del grafo con la entrada del usuario.
+            state (AgentState): Estado actual del grafo que debe incluir `"input"` con la consulta del usuario.
 
         Returns:
-            AgentState: Estado actualizado con la respuesta contextual y el nodo actual.
+            AgentState: Estado actualizado con el contexto relevante en `"response"` y `"last_node"` marcado como `"consulta"`.
         """
         result = ""
 
@@ -76,6 +101,7 @@ class RetrieverAgent:
                 print("🔍 Documentos recuperados:", ", ".join(resumen))
 
                 result = "\n\n".join(result_sections)
+
         return {
             "response": result,
             "last_node": "consulta",

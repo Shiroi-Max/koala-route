@@ -1,12 +1,16 @@
 """
-Agente responsable de generar respuestas usando un modelo LLM desplegado en Azure OpenAI.
+Agente LLM responsable de generar respuestas utilizando un modelo de lenguaje desplegado en Azure OpenAI.
 
-Este agente utiliza el cliente `AzureOpenAI` para enviar prompts en formato ChatML y obtener
-respuestas conversacionales desde el modelo configurado (por ejemplo, GPT-3.5-Turbo).
+Este agente recibe una lista de mensajes en formato ChatML (almacenados en el estado) y
+utiliza la función `call_openai_chat` para obtener una respuesta conversacional del modelo,
+como GPT-3.5-Turbo o GPT-4, configurado mediante Azure.
+
+Forma parte de una arquitectura RAG, ejecutándose típicamente después de la preparación del prompt
+por parte del controlador.
 
 Requiere:
-- `call_openai_chat` desde `llm.py`, que se encarga de llamar a la API de Azure OpenAI.
-- Un estado que contenga los mensajes en formato ChatML (preparados previamente por el controlador).
+- `call_openai_chat` desde `llm.py` para realizar la llamada a la API de Azure OpenAI.
+- Un estado (`AgentState`) que contenga la clave `"response"` con los mensajes ChatML.
 """
 
 from dataclasses import dataclass
@@ -21,7 +25,7 @@ class LLMAgent:
     Agente responsable de comunicarse con Azure OpenAI para generar una respuesta
     basada en los mensajes formateados en el estado.
 
-    Este agente espera que el campo `state["response"]` contenga una lista de mensajes
+    Este agente espera que el campo `state.get("response")` contenga una lista de mensajes
     en formato ChatML, lista para enviar al modelo.
     """
 
@@ -30,8 +34,8 @@ class LLMAgent:
         Genera una respuesta basada en los mensajes proporcionados.
 
         Args:
-            state (StateSchema): Estado actual del grafo, donde `state["response"]`
-                                 contiene los mensajes en formato ChatML.
+            state (AgentState): Estado actual del grafo, donde `state.get("response")`
+                                contiene los mensajes en formato ChatML.
 
         Returns:
             AgentState: Nuevo estado actualizado con la respuesta generada y control de flujo.

@@ -1,4 +1,17 @@
-# app.py
+"""
+Interfaz principal de la aplicación KoalaRoute utilizando Streamlit.
+
+Esta aplicación permite a los usuarios generar itinerarios de viaje por Australia de forma personalizada,
+mediante un sistema basado en LLM y recuperación de contexto (RAG). El usuario introduce sus preferencias
+y el sistema construye un prompt estructurado para generar una respuesta coherente y contextualizada.
+
+Características:
+- Entrada de texto libre para deseos del viaje.
+- Selección de duración, presupuesto, tipo de viaje e intereses.
+- Visualización del uso de tokens antes de enviar.
+- Generación del itinerario mediante `run_prompt` (flujo LLM + RAG).
+"""
+
 import streamlit as st
 import yaml
 from webapp.runner import run_prompt
@@ -6,16 +19,17 @@ from webapp.runner import run_prompt
 from config.config import MAX_PROMPT_TOKENS, UI_OPTIONS_PATH
 from modules.prompt_utils import encoding, load_formatted_prompt
 
-# Cargar opciones de interfaz desde archivo YAML
+# ---------- CARGA DE OPCIONES DE UI DESDE YAML ----------
 with open(UI_OPTIONS_PATH, "r", encoding="utf-8") as f:
     ui_options = yaml.safe_load(f)
 
+# ---------- CONFIGURACIÓN GENERAL DE LA PÁGINA ----------
 st.set_page_config(page_title="KoalaRoute", page_icon="🐨", layout="centered")
 
 st.title("🐨 KoalaRoute 🐨")
 st.markdown("Planifica tu aventura perfecta por Australia con inteligencia y estilo.")
 
-# Entradas de usuario
+# ---------- ENTRADA DE DETALLES DEL VIAJE ----------
 st.markdown("## ✈️ Detalles del viaje")
 user_query = st.text_input("¿Qué te gustaría hacer o visitar?")
 
@@ -25,6 +39,7 @@ with col1:
 with col2:
     budget = st.selectbox("💰 Presupuesto", ui_options["presupuestos"])
 
+# ---------- PREFERENCIAS ADICIONALES ----------
 st.markdown("## 🌟 Preferencias del viaje")
 col3, col4 = st.columns(2)
 with col3:
@@ -36,7 +51,7 @@ with col4:
         default=["Naturaleza"],
     )
 
-# Construcción del prompt base
+# ---------- CONSTRUCCIÓN DEL PROMPT ----------
 interest_str = ", ".join(interests) if interests else "cualquier tipo de actividad"
 
 prompt_base = load_formatted_prompt(
@@ -47,24 +62,23 @@ prompt_base = load_formatted_prompt(
     interests={interest_str},
 )
 
-# Tokens del input del usuario
+# ---------- CÁLCULO Y VISUALIZACIÓN DE TOKENS ----------
 user_token_count = len(encoding.encode(user_query))
 tokens_remaining = max(MAX_PROMPT_TOKENS, 0)
 progress_ratio = (
     min(user_token_count / tokens_remaining, 1.0) if tokens_remaining > 0 else 1.0
 )
 
-# Visualización dinámica del uso de tokens del usuario
 st.markdown("## 📏 Tokens disponibles para tu mensaje")
 st.progress(
     progress_ratio,
     text=f"{user_token_count} / {tokens_remaining} tokens usados en tu mensaje",
 )
 
-# Prompt completo
+# Prompt completo con sistema + entrada del usuario
 full_prompt = prompt_base + user_query
 
-# Botón de envío
+# ---------- BOTÓN Y LÓGICA DE GENERACIÓN ----------
 if st.button("🦘 Generar itinerario"):
     if not user_query.strip():
         st.warning("Por favor, describe tu viaje.")
