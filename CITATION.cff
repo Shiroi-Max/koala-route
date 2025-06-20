@@ -1,0 +1,29 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Koala Route
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Maxim
+    family-names: Utica Babyak
+    email: maxim.ub.work@gmail.com
+repository-code: 'https://github.com/Shiroi-Max/koala-route'
+abstract: >-
+  Implementation of an orchestration of AI agents using RAG
+  and LLMs.
+keywords:
+  - LLM
+  - RAG
+  - AI
+  - GenAI
+  - AI Agents
+  - Artificial Intelligence
+  - Orchestration
+license: Apache-2.0
+commit: 5e296c9014d233f5bc59580afcba7fe6f1f0ba72
+version: 1.0.0
+date-released: '2025-06-21'
