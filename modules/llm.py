@@ -19,6 +19,7 @@ from config.config import (
     AZURE_OPENAI_DEPLOYMENT,
     AZURE_OPENAI_ENDPOINT,
     MAX_COMPLETION_TOKENS,
+    TEMPERATURE,
 )
 
 # Instancia del cliente de Azure OpenAI, configurado con credenciales del entorno
@@ -50,7 +51,7 @@ def call_openai_chat(prompt_messages: list[dict]) -> str:
     response = client.chat.completions.create(
         model=deployment_name,
         messages=prompt_messages,
-        temperature=0.7,
+        temperature=TEMPERATURE,
         max_tokens=MAX_COMPLETION_TOKENS,
     )
     return response.choices[0].message.content

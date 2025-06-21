@@ -10,18 +10,20 @@ Uso:
     python uploader.py --file info.md --title "City information"
 """
 
-import os
-import uuid
-import re
 import argparse
+import os
+import re
+import uuid
 from typing import Optional
-from azure.search.documents import SearchClient
+
 from azure.core.credentials import AzureKeyCredential
+from azure.search.documents import SearchClient
+
 from config.config import (
     AZURE_SEARCH_ENDPOINT,
     AZURE_SEARCH_KEY,
-    INDEX_NAME,
     DOCS_PATH,
+    INDEX_NAME,
     SECTION_TO_CATEGORIES,
 )
 from modules.vector import vector_store
@@ -90,7 +92,7 @@ def upload_md_document(file_name: str, title: Optional[str] = None):
                 "id": str(uuid.uuid4()),
                 "title": (title or os.path.splitext(file_name)[0]).capitalize(),
                 "section": section_title,
-                "category": categories,  # ← Añadido
+                "category": categories,
                 "content": section_text,
                 "content_vector": embedding,
                 "source": f"{file_path}#section-{i}",
