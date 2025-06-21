@@ -7,14 +7,15 @@ Este módulo:
 - Envía el documento al índice vectorial en Azure Search.
 
 Uso:
-    python uploader.py --file info.md --title "City information"
+    python uploader.py --file info.md
+    python uploader.py --all
 """
 
 import argparse
 import os
 import re
 import uuid
-from typing import Optional
+from typing import List, Optional, Tuple
 
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents import SearchClient
@@ -29,43 +30,44 @@ from config.config import (
 from modules.vector import vector_store
 
 
-def split_markdown_sections(text: str, min_length: int = 200) -> list[tuple[str, str]]:
+def split_markdown_sections(text: str) -> Tuple[Optional[str], List[Tuple[str, str]]]:
     """
-    Divide un documento Markdown en secciones por encabezado.
+    Extrae el título principal y divide un documento Markdown en secciones por encabezados de nivel 2 (##).
 
     Args:
         text (str): Contenido completo del archivo Markdown.
-        min_length (int): Longitud mínima de cada sección.
 
     Returns:
-        list[tuple[str, str]]: Lista de tuplas (section_title, section_body).
+        Tuple[str | None, list[tuple[str, str]]]:
+            - Título principal (extraído del primer encabezado de nivel 1).
+            - Lista de tuplas con secciones (titulo, contenido).
     """
-    pattern = r"(?=\n*#+ )"
-    raw_chunks = re.split(pattern, text)
+    # Extraer título principal (primer encabezado de nivel 1)
+    title_match = re.search(r"^\s*#\s+(.*)", text, re.MULTILINE)
+    title = title_match.group(1).strip() if title_match else None
+
+    # Dividir por encabezados de nivel 2
+    pattern = r"(?:^|\n)(## .+?)(?=\n## |\Z)"  # captura cada sección ## ... hasta el siguiente ## o fin de texto
+    matches = re.findall(pattern, text, flags=re.DOTALL)
+
     sections = []
+    for match in matches:
+        lines = match.strip().splitlines()
+        section_title = lines[0].lstrip("#").strip()
+        section_body = "\n".join(lines[1:]).strip()
+        sections.append((section_title, section_body))
 
-    for chunk in raw_chunks:
-        chunk = chunk.strip()
-        if len(chunk) < min_length:
-            continue
-
-        lines = chunk.splitlines()
-        header = lines[0].lstrip("#").strip() if lines else "Sin título"
-        body = "\n".join(lines[1:]).strip() if len(lines) > 1 else ""
-
-        if len(body) >= min_length:
-            sections.append((header or "Sin título", body))
-
-    return sections
+    return title, sections
 
 
-def upload_md_document(file_name: str, title: Optional[str] = None):
+def upload_md_document(file_name: str):
     """
     Carga un archivo .md al índice de Azure Search con sus secciones vectorizadas.
 
+    El título del documento se extrae automáticamente del primer encabezado de nivel 1 (# Ciudad).
+
     Args:
         file_name (str): Nombre del archivo Markdown en DOCS_PATH.
-        title (Optional[str]): Título principal del documento.
     """
     file_path = os.path.join(DOCS_PATH, file_name)
     if not os.path.isfile(file_path):
@@ -74,7 +76,8 @@ def upload_md_document(file_name: str, title: Optional[str] = None):
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    section_chunks = split_markdown_sections(content)
+    # Obtener título y secciones desde el Markdown
+    title, section_chunks = split_markdown_sections(content)
 
     search_client = SearchClient(
         endpoint=AZURE_SEARCH_ENDPOINT,
@@ -90,7 +93,7 @@ def upload_md_document(file_name: str, title: Optional[str] = None):
         documents.append(
             {
                 "id": str(uuid.uuid4()),
-                "title": (title or os.path.splitext(file_name)[0]).capitalize(),
+                "title": title,
                 "section": section_title,
                 "category": categories,
                 "content": section_text,
@@ -100,7 +103,7 @@ def upload_md_document(file_name: str, title: Optional[str] = None):
         )
 
     result = search_client.upload_documents(documents=documents)
-    print(f"✅ Subidas {len(documents)} secciones de '{file_name}'")
+    print(f"✅ Subidas {len(documents)} secciones de '{title}'")
     return result
 
 
@@ -111,7 +114,11 @@ def upload_all_md_documents():
     Itera sobre todos los ficheros .md en la carpeta especificada,
     ejecutando `upload_md_document()` sobre cada uno de ellos.
     """
-    md_files = [f for f in os.listdir(DOCS_PATH) if f.endswith(".md")]
+    md_files = [
+        f
+        for f in os.listdir(DOCS_PATH)
+        if f.endswith(".md") and f.lower() != "template.md"
+    ]
 
     if not md_files:
         print("⚠️ No se encontraron archivos .md en la carpeta DOCS_PATH.")
@@ -120,7 +127,7 @@ def upload_all_md_documents():
     for file_name in md_files:
         try:
             print(f"⬆️ Subiendo '{file_name}'...")
-            upload_md_document(file_name=file_name)
+            upload_md_document(file_name)
         except Exception as e:
             print(f"❌ Error al subir '{file_name}': {e}")
 
@@ -142,9 +149,6 @@ def main():
         action="store_true",
         help="Sube todos los archivos .md dentro de la carpeta data/",
     )
-    parser.add_argument(
-        "--title", help="Título opcional del documento base (solo con --file)"
-    )
 
     args = parser.parse_args()
 
@@ -152,7 +156,7 @@ def main():
         if args.all:
             upload_all_md_documents()
         else:
-            upload_md_document(file_name=args.file, title=args.title)
+            upload_md_document(args.file)
     except Exception as e:
         print(f"❌ Error al subir el documento: {e}")
 

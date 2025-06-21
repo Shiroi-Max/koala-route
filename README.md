@@ -96,7 +96,7 @@ Permite planificar viajes con filtros, duración, presupuesto e intereses.
 Los documentos deben estar almacenados en ``DOCS_PATH``, constante definida en ``config.py``
 
 ```bash
-python uploader.py --file info.txt --title "LangChain Overview"
+python uploader.py --file info.md
 ```
 
 ```bash
