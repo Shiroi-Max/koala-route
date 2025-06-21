@@ -21,10 +21,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from config.config import RETRIEVER_K, SIMILARITY_THRESHOLD
 from modules.graph.agent_state import AgentState
-from modules.prompt_utils import (
-    extract_user_interests_from_prompt,
-    load_prompt,
-)
+from modules.prompt_utils import extract_user_interests_from_prompt, load_prompt
 
 
 @dataclass
@@ -58,16 +55,27 @@ class RetrieverAgent:
         Returns:
             AgentState: Estado actualizado con el contexto relevante en `"response"` y `"last_node"` marcado como `"consulta"`.
         """
-        result = ""
+        result = ""  # Inicializamos el resultado (bloque de contexto)
 
+        # Cargamos el prompt base que servirá de plantilla para extraer los intereses
         prompt_template = load_prompt("prompt_base")
+
+        # Consulta del usuario desde el estado
         user_query = state["input"]
+
+        # Extraemos los intereses desde el prompt rellenado
         user_interests = extract_user_interests_from_prompt(prompt_template, user_query)
+
+        # Normalizamos los intereses a minúsculas para hacer matching más robusto
         user_interests_normalized = [i.lower() for i in user_interests]
 
+        # Búsqueda semántica en el vector store (Azure Search), top-k resultados
         docs = self.vector_store.similarity_search(user_query, k=RETRIEVER_K)
+
+        # Calculamos el embedding del usuario para medir similitud más adelante
         query_embedding = self.vector_store.embedding_function(user_query)
 
+        # Filtrado por coincidencia temática en metadatos de sección
         section_filtered_docs = []
         for doc in docs:
             section = doc.metadata.get("section", "").lower()
@@ -76,17 +84,24 @@ class RetrieverAgent:
             ):
                 section_filtered_docs.append(doc)
 
+        # Si hay documentos que pasaron el primer filtro, evaluamos la similitud exacta
         if section_filtered_docs:
             relevant, similarities = [], []
             for doc in section_filtered_docs:
+                # Combinamos título y contenido para obtener el embedding final
                 title = doc.metadata.get("title", "")
                 combined_text = f"{title}. {doc.page_content}"
                 doc_embedding = self.vector_store.embedding_function(combined_text)
+
+                # Similitud coseno entre consulta y documento
                 similarity = cosine_similarity([query_embedding], [doc_embedding])[0][0]
+
+                # Si supera el umbral, lo consideramos relevante
                 if similarity >= SIMILARITY_THRESHOLD:
                     relevant.append(doc)
                     similarities.append(similarity)
 
+            # Si hay documentos relevantes, los estructuramos en Markdown
             if relevant:
                 result_sections, resumen = [], []
                 for doc, sim in zip(relevant, similarities):
@@ -97,11 +112,14 @@ class RetrieverAgent:
                     resumen.append(f"{title} > {section} (sim={sim:.2f})")
                     result_sections.append(f"## {title} > {section}\n\n{content}")
 
+                # Imprimimos resumen informativo en consola
                 print(f"🔍 Recuperados {len(relevant)} documentos relevantes")
                 print("🔍 Documentos recuperados:", ", ".join(resumen))
 
+                # Unimos las secciones en un solo bloque de texto
                 result = "\n\n".join(result_sections)
 
+        # Devolvemos el estado actualizado con el contexto y el nodo actual
         return {
             "response": result,
             "last_node": "consulta",
