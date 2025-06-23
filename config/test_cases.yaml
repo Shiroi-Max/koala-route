@@ -28,7 +28,60 @@
     - "Melbourne#Datos Curiosos"
   evaluate_retrieval_docs: true
 
-- name: Escenario 3 - Viaje familiar temático (5 días)
+- name: Escenario 3 - Gastronomía y relax costero (6 días)
+  budget: Medio
+  travel_type: Pareja
+  interests:
+    - Gastronomía
+    - Playas
+    - Clima agradable
+  duration_days: 6
+  user_input: "Queremos disfrutar de buena comida local y relajarnos en la playa. Preferiblemente en Gold Coast o alrededores."
+  expected_relevant_docs:
+    - "Gold Coast#"
+    - "Gold Coast#"
+    - "Gold Coast#"
+  evaluate_retrieval_docs: true
+
+- name: Escenario 4 - Ruta de festivales en ciudades grandes (7 días)
+  budget: Alto
+  travel_type: Grupo
+  interests:
+    - Festivales y eventos
+    - Cultura
+    - Turismo urbano
+  duration_days: 7
+  user_input: "Planeamos asistir a eventos culturales importantes en ciudades como Sídney o Melbourne."
+  expected_relevant_docs:
+    - "Sídney#"
+    - "Melbourne#"
+    - "Sídney#"
+  evaluate_retrieval_docs: true
+
+- name: Escenario 5 - Aventura ecológica en zonas poco turísticas (4 días)
+  budget: Económico
+  travel_type: Individual
+  interests:
+    - Naturaleza
+    - Aventura
+    - Viaje económico
+  duration_days: 4
+  user_input: "Me gustaría explorar rutas naturales menos concurridas, con actividades al aire libre, sin gastar mucho."
+  evaluate_retrieval_docs: false
+
+- name: Escenario 6 - Itinerario mixto con preferencias amplias (5 días)
+  budget: Medio
+  travel_type: Pareja
+  interests:
+    - Turismo urbano
+    - Cultura
+    - Playas
+    - Naturaleza
+  duration_days: 5
+  user_input: "Queremos una combinación equilibrada de ciudad, cultura y naturaleza. Nos interesa incluir algo de playa también."
+  evaluate_retrieval_docs: false
+
+- name: Escenario 7 - Viaje familiar temático (5 días)
   budget: Alto
   travel_type: Familia
   interests:
@@ -39,8 +92,7 @@
   user_input: "Buscamos actividades divertidas y seguras para niños en contacto con la naturaleza. Nos movemos en transporte público."
   evaluate_retrieval_docs: false
 
-
-- name: Escenario 4 - Viaje sin intereses definidos (4 días)
+- name: Escenario 8 - Viaje sin intereses definidos (4 días)
   budget: Económico
   travel_type: Mochilero
   interests: []

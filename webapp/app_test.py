@@ -38,17 +38,17 @@ from webapp.runner import run_prompt
 st.set_page_config(page_title="KoalaTest", page_icon="🐨🛠️", layout="centered")
 st.title("Evaluador de escenarios de prueba")
 
-available_files = get_available_scenarios()
+available_scenarios = get_available_scenarios()
 
-if not available_files:
+if not available_scenarios:
     st.warning("No se encontraron archivos de escenario.")
 else:
-    selected_file = st.selectbox("Selecciona un escenario:", available_files)
+    selected_scenario = st.selectbox("Selecciona un escenario:", available_scenarios)
 
     if st.button("Ejecutar evaluación"):
         with st.spinner("Procesando escenario..."):
             # Cargar datos del escenario
-            scenario_data = load_scenario_by_name(selected_file)
+            scenario_data = load_scenario_by_name(selected_scenario)
 
             # Construir prompt completo
             interest_str = (

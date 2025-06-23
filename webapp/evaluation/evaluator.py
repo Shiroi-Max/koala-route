@@ -128,14 +128,15 @@ class Evaluator:
             )
             results["Recall adaptativo"] = round(recall, 2)
 
+        if scenario["interests"]:
             # Métrica de cobertura temática
             coverage = self.thematic_coverage(
-                scenario.get("interests", []), scenario["retrieved_docs"]
+                scenario["interests"], scenario["retrieved_docs"]
             )
             results["Cobertura Temática"] = round(coverage, 2)
 
-            # Métrica de coherencia semántica
-            coherence = self.semantic_similarity(scenario["retrieved_docs"])
-            results["Coherencia Semántica"] = round(coherence, 2)
+        # Métrica de coherencia semántica
+        coherence = self.semantic_similarity(scenario["retrieved_docs"])
+        results["Coherencia Semántica"] = round(coherence, 2)
 
         return results
