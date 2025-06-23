@@ -36,7 +36,7 @@ from webapp.evaluation.scenario_utils import (
 )
 from webapp.runner import run_prompt
 
-st.set_page_config(page_title="Evaluador de escenarios", layout="centered")
+st.set_page_config(page_title="KoalaTest", page_icon="🐨🛠️", layout="centered")
 st.title("Evaluador de escenarios de prueba")
 
 available_files = get_available_scenarios()
