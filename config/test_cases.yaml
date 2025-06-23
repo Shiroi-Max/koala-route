@@ -10,11 +10,7 @@
     - "Brisbane#Descripción General"
     - "Brisbane#Principales Atracciones"
     - "Brisbane#Clima"
-  reference_response: |
-    Day 1: Paseo por el Brisbane Botanical Garden, ideal para apreciar flora local y descansar en espacios verdes.
-    Day 2: Excursión al parque nacional más cercano a Brisbane, como parte de una escapada natural.
-    Day 3: Recorrido por zonas verdes urbanas y jardines de la ciudad, disfrutando del clima agradable.
-  evaluate: true
+  evaluate_retrieval_docs: true
 
 - name: Escenario 2 - Viaje cultural de 7 días
   budget: Medio
@@ -30,16 +26,7 @@
     - "Melbourne#Principales Atracciones"
     - "Melbourne#Eventos y Festivales"
     - "Melbourne#Datos Curiosos"
-  reference_response: |
-    Day 1: Recorrido por el centro histórico de Melbourne, incluyendo calles emblemáticas y arquitectura colonial.
-    Day 2: Visita al Melbourne Museum, uno de los más importantes del país.
-    Day 3: Exploración de la National Gallery of Victoria, destacada por sus colecciones de arte.
-    Day 4: Recorrido por los barrios culturales como Fitzroy, con arte callejero y galerías independientes.
-    Day 5: Visita al Melbourne Arts Precinct, con teatros y centros de exposiciones.
-    Day 6: Descubrimiento del Royal Exhibition Building, patrimonio mundial.
-    Day 7: Caminata por Carlton Gardens y zonas históricas adyacentes.
-  evaluate: true
-
+  evaluate_retrieval_docs: true
 
 - name: Escenario 3 - Viaje familiar temático (5 días)
   budget: Alto
@@ -50,7 +37,7 @@
     - Naturaleza
   duration_days: 5
   user_input: "Buscamos actividades divertidas y seguras para niños en contacto con la naturaleza. Nos movemos en transporte público."
-  evaluate: false
+  evaluate_retrieval_docs: false
 
 
 - name: Escenario 4 - Viaje sin intereses definidos (4 días)
@@ -59,4 +46,4 @@
   interests: []
   duration_days: 4
   user_input: "Solo quiero un itinerario barato para recorrer varias ciudades por mi cuenta."
-  evaluate: false
+  evaluate_retrieval_docs: false

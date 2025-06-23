@@ -1,8 +1,8 @@
 """
 Interfaz web para evaluación de escenarios RAG mediante Streamlit.
 
-Este módulo define una aplicación Streamlit que permite seleccionar y ejecutar escenarios de prueba 
-predefinidos. Cada escenario contiene una consulta del usuario, información contextual y una respuesta esperada. 
+Este módulo define una aplicación Streamlit que permite seleccionar y ejecutar escenarios de prueba
+predefinidos. Cada escenario contiene una consulta del usuario, información contextual y una respuesta esperada.
 El flujo de evaluación consiste en:
 
 1. Selección de un escenario desde un desplegable.
@@ -24,7 +24,6 @@ Requiere archivos de escenario YAML ubicados en el directorio correspondiente, a
 Uso:
 Ejecutar `streamlit run webapp/app_test.py` desde la raíz del proyecto.
 """
-
 
 import streamlit as st
 
@@ -75,7 +74,6 @@ else:
             generated_response = generated_output.get("generated_response", "")
             retrieved_docs = generated_output.get("retrieved_docs", [])
 
-            scenario_data["generated_response"] = generated_response
             scenario_data["retrieved_docs"] = retrieved_docs
 
             # Evaluar

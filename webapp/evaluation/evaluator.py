@@ -8,26 +8,17 @@ automáticamente las salidas del sistema con respuestas de referencia en escenar
 Funcionalidades:
 - `recall_at_k`: Evalúa la calidad de la recuperación mediante la métrica de Recall adaptativo,
   ajustando dinámicamente el valor de `k` según el número de documentos recuperados.
-- `semantic_similarity`: Calcula la similitud semántica entre la respuesta generada y una respuesta
-  de referencia utilizando embeddings y similitud coseno.
+- `semantic_similarity`: Calcula la similitud semántica entre la consulta del usuario y los textos recuperados utilizando embeddings y similitud media del coseno.
 - `evaluate_scenario`: Evalúa un escenario completo, devolviendo un diccionario con las métricas
   obtenidas.
-
-Requisitos:
-- El escenario debe incluir los campos `generated_response` y `reference_response` para evaluar
-  la coherencia semántica.
-- Si `evaluate` es `True`, también se requieren `expected_relevant_docs` y `retrieved_docs`.
 
 Dependencias:
 - `embeddings`: Objeto de embeddings compartido, inicializado desde `modules.vector`.
 - `K_EVAL_THRESHOLD`: Proporción configurable de documentos usados como top-K en el cálculo de recall.
 """
 
-
 from math import ceil
 from typing import Dict, List, Set
-
-from sklearn.metrics.pairwise import cosine_similarity
 
 from config.config import K_EVAL_THRESHOLD
 from modules.vector import embeddings
@@ -61,7 +52,9 @@ class Evaluator:
         total_relevant = len(relevant_docs)
         return relevant_retrieved / total_relevant if total_relevant > 0 else 0.0
 
-    def thematic_coverage(self, interests: List[str], retrieved_docs: List[Dict]) -> float:
+    def thematic_coverage(
+        self, interests: List[str], retrieved_docs: List[Dict]
+    ) -> float:
         """
         Calcula la cobertura temática de los documentos recuperados respecto a los intereses del usuario.
 
@@ -93,32 +86,31 @@ class Evaluator:
         matches = sum(1 for i in interests_normalized if i in retrieved_categories)
         return matches / len(interests_normalized) if interests_normalized else 0.0
 
-    def semantic_similarity(self, generated: str, reference: str) -> float:
+    def semantic_similarity(self, retrieved_docs: List[Dict]) -> float:
         """
-        Calcula la similitud semántica entre una respuesta generada y una respuesta de referencia,
-        usando embeddings y similitud coseno.
+        Calcula la similitud semántica entre la consulta del usuario y los documentos recuperados,
+        utilizando los valores de similitud precomputados.
 
         Args:
-            generated (str): Respuesta generada por el sistema.
-            reference (str): Respuesta de referencia esperada.
+            retrieved_docs (List[Dict]): Lista de documentos recuperados, cada uno con el campo 'similarity'.
 
         Returns:
-            float: Valor de similitud coseno entre los embeddings, entre -1.0 y 1.0.
+            float: Similitud promedio entre la consulta del usuario y los documentos recuperados.
         """
-        emb_generated = self.embeddings.embed_query(generated)
-        emb_reference = self.embeddings.embed_query(reference)
-        return cosine_similarity([emb_generated], [emb_reference])[0][0]
+        similarities = [
+            doc.get("similarity") for doc in retrieved_docs if "similarity" in doc
+        ]
+
+        return sum(similarities) / len(similarities) if similarities else 0.0
 
     def evaluate_scenario(self, scenario: Dict) -> Dict:
         """
         Evalúa un escenario de prueba comparando los resultados generados con los esperados.
 
         Esta función calcula varias métricas para analizar la calidad de la recuperación y la generación:
-        - Recall adaptativo: porcentaje de documentos esperados que se encuentran entre los recuperados (ajustado por k dinámico).
+        - Recall adaptativo: porcentaje de documentos esperados que han sido recuperados, ajustado según un umbral proporcional a k.
         - Cobertura Temática: proporción de intereses del usuario que están representados en las categorías de los documentos recuperados.
-        - Coherencia Semántica: similitud entre la respuesta generada y una respuesta de referencia.
-
-        La evaluación de recuperación solo se ejecuta si el campo `evaluate` está presente y es True.
+        - Coherencia Semántica: similitud entre la consulta del usuario y los textos recuperados.
 
         Args:
             scenario (Dict): Diccionario con la información del escenario
@@ -129,7 +121,7 @@ class Evaluator:
 
         results = {"Escenario": scenario["name"]}
 
-        if scenario.get("evaluate", True):
+        if scenario["evaluate_retrieval_docs"]:
             # Métrica de recall adaptativo
             recall = self.recall_at_k(
                 set(scenario["expected_relevant_docs"]), scenario["retrieved_docs"]
@@ -143,10 +135,7 @@ class Evaluator:
             results["Cobertura Temática"] = round(coverage, 2)
 
             # Métrica de coherencia semántica
-            if "reference_response" in scenario and "generated_response" in scenario:
-                coherence = self.semantic_similarity(
-                    scenario["generated_response"], scenario["reference_response"]
-                )
-                results["Coherencia Semántica"] = round(coherence, 2)
+            coherence = self.semantic_similarity(scenario["retrieved_docs"])
+            results["Coherencia Semántica"] = round(coherence, 2)
 
         return results

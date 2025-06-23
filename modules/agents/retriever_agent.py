@@ -53,7 +53,7 @@ class RetrieverAgent:
             state (AgentState): Estado actual del grafo que debe incluir `"input"` con la consulta del usuario.
 
         Returns:
-            AgentState: Estado actualizado con el contexto relevante en `"response"` y `"last_node"` marcado como `"consulta"`.
+            AgentState: Estado actualizado con el contexto relevante en `"response"`, `"last_node"` marcado como `"consulta"` y `"retrieved_docs"` con los documentos recuperados.
         """
         result = ""  # Inicializamos el resultado (bloque de contexto)
         retrieved_docs = []  # Lista para almacenar documentos recuperados
@@ -77,7 +77,7 @@ class RetrieverAgent:
         category_filtered_docs = []
         for doc in docs:
             categories = [c.lower() for c in doc.metadata.get("category", [])]
-            
+
             if not user_interests_normalized or any(
                 interest in categories for interest in user_interests_normalized
             ):
@@ -94,7 +94,7 @@ class RetrieverAgent:
 
                 # Similitud coseno entre consulta y documento
                 similarity = cosine_similarity([query_embedding], [doc_embedding])[0][0]
-                
+
                 # Si supera el umbral, lo consideramos relevante
                 if similarity >= SIMILARITY_THRESHOLD:
                     relevant.append(doc)
@@ -105,18 +105,21 @@ class RetrieverAgent:
                 result_sections = []
                 retrieved_docs = []
 
-                for doc in relevant:
+                for doc, similarity in zip(relevant, similarities):
                     title = doc.metadata.get("title", "Sin título")
                     section = doc.metadata.get("section", "Sin sección")
                     categories = doc.metadata.get("category", [])
-
                     content = doc.page_content.strip()
+
                     result_sections.append(f"## {title} > {section}\n\n{content}")
 
-                    retrieved_docs.append({
-                        "id": f"{title}#{section}",
-                        "category": categories,
-                    })
+                    retrieved_docs.append(
+                        {
+                            "id": f"{title}#{section}",
+                            "category": categories,
+                            "similarity": round(similarity, 4),
+                        }
+                    )
 
                 # Unimos las secciones en un solo bloque de texto
                 result = "\n\n".join(result_sections)
