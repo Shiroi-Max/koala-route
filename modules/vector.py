@@ -3,28 +3,41 @@ Módulo para inicializar los embeddings y el vector store de Azure Cognitive Sea
 
 Este módulo configura dos componentes esenciales para la fase de recuperación semántica (RAG):
 
-1. `embeddings`: Modelo de embeddings basado en HuggingFace, usado para convertir textos en vectores.
-2. `vector_store`: Objeto `AzureSearch` de LangChain configurado para buscar documentos relevantes
-   a través de similitud semántica sobre un índice existente en Azure.
+1. `embeddings`: Modelo de embeddings de Azure OpenAI, encargado de convertir textos en vectores
+   utilizando un despliegue configurado del modelo `text-embedding-3-large` (u otro compatible).
+2. `vector_store`: Objeto `AzureSearch` de LangChain configurado para realizar búsquedas híbridas
+   (semánticas + léxicas) sobre un índice existente en Azure Cognitive Search.
 
 Exporta:
-- `vector_store`: Instancia lista para ser usada por el agente de recuperación (`RetrieverAgent`).
+- `vector_store`: Instancia lista para ser utilizada por el agente de recuperación (`RetrieverAgent`).
 """
 
+from langchain_openai import AzureOpenAIEmbeddings
 from langchain_community.vectorstores import AzureSearch
-from langchain_huggingface import HuggingFaceEmbeddings
 
 from config.config import (
+    AZURE_OPENAI_EMBEDDINGS_API_KEY,
+    AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT,
+    AZURE_OPENAI_EMBEDDINGS_ENDPOINT,
     AZURE_SEARCH_ENDPOINT,
     AZURE_SEARCH_KEY,
-    EMBEDDING_MODEL_ID,
     INDEX_NAME,
+    API_VERSION_EMBEDDINGS,
 )
 
 # ---------- EMBEDDINGS ----------
-# Inicializa el modelo de embeddings desde HuggingFace usando el identificador configurado.
-# Este modelo se encargará de convertir consultas y documentos en vectores numéricos.
-embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL_ID)
+# Inicializa el modelo de embeddings usando Azure OpenAI.
+# Este modelo convierte las consultas y los documentos en vectores numéricos (embeddings),
+# que posteriormente se utilizan para realizar búsquedas semánticas en Azure Cognitive Search.
+# El despliegue del modelo debe haberse realizado previamente en Azure OpenAI y configurado en el sistema.
+embeddings = AzureOpenAIEmbeddings(
+    azure_deployment=AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT,
+    azure_endpoint=AZURE_OPENAI_EMBEDDINGS_ENDPOINT,
+    openai_api_key=AZURE_OPENAI_EMBEDDINGS_API_KEY,
+    openai_api_type="azure",
+    openai_api_version=API_VERSION_EMBEDDINGS,
+)
+
 
 # ---------- VECTOR STORE ----------
 # Configura el almacén vectorial utilizando Azure Cognitive Search.

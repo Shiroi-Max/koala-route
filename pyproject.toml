@@ -13,17 +13,15 @@ dependencies = [
     # ===============================
     # ⚙️ Core: LangChain + LangGraph
     # ===============================
-    "langchain_huggingface",
     "langchain_community",
+    "langchain-openai",
     "langgraph",
 
     # ===============================
-    # 🤖 Modelos y LLMs (Azure OpenAI + Embeddings)
+    # 🤖 LLMs (Azure OpenAI)
     # ===============================
     "openai",                   # Cliente oficial OpenAI/Azure OpenAI
-    "sentence-transformers",   # Embeddings HuggingFace
-    "tiktoken",                # Conteo de tokens
-    "accelerate",              # Gestión automática de dispositivos (GPU/CPU) y ejecución eficiente
+    "tiktoken",                 # Conteo de tokens
 
     # ===============================
     # 🔍 Azure Cognitive Search
@@ -35,7 +33,6 @@ dependencies = [
     # 📊 Métricas, similitud y cálculo
     # ===============================
     "scikit-learn",            # cosine_similarity
-    "numpy<2.0",               # Compatibilidad con otras libs
 
     # ===============================
     # 🔧 Utilidades generales
@@ -64,7 +61,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["modules", "modules.agents", "modules.graph", "config", "webapp"]
+packages = ["modules", "modules.agents", "modules.graph", "config", "webapp", "webapp.evaluation"]
 
 [tool.setuptools.package-dir]
 "" = "."

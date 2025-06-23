@@ -1,21 +1,25 @@
-# 🧠 RAG + LLM con LangChain, Langgraph, Hugging Face y Azure AI Search
+<p align="center">
+  <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="license" />
+  <img src="https://img.shields.io/badge/Built%20with-Python%203.12-blue.svg" alt="python" />
+  <img src="https://img.shields.io/badge/Powered%20by-Azure%20OpenAI%20%7C%20LangGraph%20%7C%20Streamlit-orange.svg" alt="powered by" />
+</p>
+
+# 🐨 Koala Route 🐨
 Este proyecto implementa un sistema de Recuperación y Generación Aumentada (RAG) que:
 
-- Usa Azure Cognitive Search como base vectorial.  
-- Aplica embeddings locales con `sentence-transformers` y `torch` (CPU/GPU).  
-- Utiliza Azure OpenAI (GPT-3.5-Turbo) para generación de respuestas mediante LangGraph.  
-- Integra un orquestador de agentes con LangGraph para gestionar flujo de recuperación y generación.  
-- Dispone de interfaz web con Streamlit para interacción amigable.  
-- Soporta gestión de tokens y límites para optimizar costos.  
-- Utiliza `.env` para gestión segura de credenciales.  
-- Soporta aceleración con `accelerate` para aprovechar GPU en embeddings.
+- Usa Azure Cognitive Search como almacén vectorial para realizar recuperación semántica eficiente. 
+- Utiliza Azure OpenAI (GPT-3.5-Turbo) para la generación de respuestas mediante LangGraph. 
+- Integra un orquestador de agentes con LangGraph para gestionar el flujo de recuperación y generación de manera modular.
+- Emplea un modelo de embedding de Azure OpenAI (text-embedding-3-large) para convertir documentos y consultas en vectores, garantizando compatibilidad total con el índice configurado en Azure Search.
+- Dispone de interfaz web con Streamlit para una interacción amigable y evaluación de escenarios de prueba.
+- Soporta gestión de tokens y límites de uso para optimizar el coste de las llamadas a la API.
+- Utiliza `.env` para una gestión segura y centralizada de credenciales y endpoints de Azure.
 
 ---
 
 ## 🚀 Requisitos
 
 - Python **3.12**  
-- GPU compatible con **CUDA 12.1** (recomendado para embeddings y aceleración)  
 - Dependencias gestionadas con `pyproject.toml`  
 - Archivo `.env` configurado con credenciales de Azure
 
@@ -44,17 +48,7 @@ python -m venv .venv
 
 ---
 
-### 2. Instala PyTorch con soporte GPU (CUDA 12.1)
-
-> 🛠️ Este paso es **obligatorio** antes de instalar el resto.
-
-```bash
-pip install torch --index-url https://download.pytorch.org/whl/cu121
-```
-
----
-
-### 3. Instala el resto de dependencias del proyecto
+### 2. Instala las dependencias del proyecto
 
 ```bash
 pip install .
@@ -68,14 +62,22 @@ pip install ".[dev]"
 
 ---
 
-### 4. Crea y configura tu archivo .env
+### 3. Crea y configura tu archivo .env
 
 ```ini
+# 🔎 Azure Cognitive Search
 AZURE_SEARCH_ENDPOINT=https://<tu-endpoint>.search.windows.net
 AZURE_SEARCH_KEY=<tu-clave-secreta>
+
+# 🤖 Azure OpenAI para generación
+AZURE_OPENAI_ENDPOINT=https://<tu-endpoint-openai>.openai.azure.com/
 AZURE_OPENAI_API_KEY=<tu-api-key>
-AZURE_OPENAI_ENDPOINT=https://<openai-endpoint>.openai.azure.com/
-AZURE_OPENAI_DEPLOYMENT=<tu-modelo>
+AZURE_OPENAI_DEPLOYMENT=<nombre-del-deployment-de-generación>
+
+# 📐 Azure OpenAI para embeddings
+AZURE_OPENAI_EMBEDDINGS_ENDPOINT=https://<tu-endpoint-openai>.openai.azure.com/
+AZURE_OPENAI_EMBEDDINGS_API_KEY=<tu-api-key-embeddings>
+AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT=<nombre-del-deployment-de-embeddings>
 ```
 
 ---
@@ -117,11 +119,12 @@ python deleter.py --all
 
 ## 📂 Estructura del proyecto
 
-```arduino
+```
 koalaRoute/
 ├── config/
 │   ├── config.py
 |   ├── prompts.yaml
+|   ├── test_cases.yaml
 |   └── ui_options.yaml
 ├── data/
 │   └── template.md
@@ -137,6 +140,10 @@ koalaRoute/
 │   ├── prompt_utils.py
 │   └── vector.py
 ├── webapp/
+│   ├── evaluations/
+|   |   ├── evaluator.py
+|   |   └── scenario_utils.py
+│   ├── app_test.py
 │   ├── app.py
 |   └── runner.py
 ├── main.py
@@ -151,12 +158,13 @@ koalaRoute/
 
 ## ✅ Estado
 
-- Orquestación con LangGraph funcionando con Azure OpenAI y Azure Cognitive Search.
-- Embeddings con sentence-transformers acelerados con torch y accelerate.
-- Interfaz web Streamlit con filtros avanzados y control de tokens.
-- Manejo de tokens con tiktoken para evitar sobrecostos.
-- Configuración segura con .env.
-- Documentación y scripts para subir/eliminar documentos en índice.
+- Orquestación funcional con LangGraph, integrando Azure OpenAI (GPT-3.5-Turbo) y Azure Cognitive Search.
+- Embeddings gestionados desde Azure OpenAI, compatibles con el índice vectorial configurado en Azure Search.
+- Interfaz web en Streamlit con selección de escenarios de prueba, visualización de resultados y control de generación.
+- Evaluación automática de respuestas mediante métricas como Recall@k y coherencia semántica.
+- Gestión de tokens optimizada con tiktoken para prevenir sobrecostos en llamadas al modelo.
+- Variables sensibles y configuración externa gestionadas mediante `.env`.
+- Incluye scripts y documentación para subir, eliminar y administrar documentos en el índice vectorial.
 
 ---
 

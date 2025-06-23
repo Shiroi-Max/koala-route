@@ -3,14 +3,18 @@ Ejecutor principal del grafo LangGraph.
 
 Este módulo sirve como punto de entrada para interactuar con el flujo de agentes definido
 en el grafo de LangGraph. Permite ejecutar una única interacción completa con el sistema RAG,
-recibiendo una entrada del usuario y devolviendo una respuesta generada.
+recibiendo una entrada del usuario y devolviendo tanto la respuesta generada como los
+documentos relevantes recuperados.
 
 Responsabilidades:
-- Instancia el grafo a través de `build_langgraph_controller_flow`.
-- Expone la función `run_prompt`, que toma una consulta y devuelve la respuesta final.
+- Instancia el grafo mediante `build_langgraph_controller_flow`.
+- Expone la función `run_prompt`, que toma una consulta del usuario y devuelve un diccionario
+  con la respuesta final generada por el modelo y la lista de documentos utilizados.
 
-Excepciones son gestionadas con trazas impresas para facilitar la depuración en entorno local.
+La gestión de errores se realiza mediante trazas impresas, facilitando la depuración
+en entornos de desarrollo local.
 """
+
 
 import traceback
 
@@ -32,7 +36,9 @@ def run_prompt(user_query: str) -> str:
         user_query (str): Texto introducido por el usuario (consulta o petición de itinerario).
 
     Returns:
-        str: Respuesta generada por el modelo, ya procesada por el sistema.
+        dict: Diccionario con los siguientes campos:
+            - "generated_response": Respuesta generada por el modelo.
+            - "retrieved_docs": Lista de identificadores de documentos recuperados (formato "título#sección").
 
     Raises:
         RuntimeError: Si ocurre algún error durante la ejecución del grafo.
@@ -45,7 +51,10 @@ def run_prompt(user_query: str) -> str:
         result = dialogue_manager.invoke(state)
 
         # Retornar la respuesta generada
-        return result.get("response")
+        return {
+            "generated_response": result.get("response", ""),
+            "retrieved_docs": result.get("retrieved_docs", []),
+        }
 
     except Exception as e:
         print("💥 ERROR ejecutando el grafo:")

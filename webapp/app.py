@@ -10,6 +10,9 @@ Características:
 - Selección de duración, presupuesto, tipo de viaje e intereses.
 - Visualización del uso de tokens antes de enviar.
 - Generación del itinerario mediante `run_prompt` (flujo LLM + RAG).
+
+Uso:
+Ejecutar `streamlit run webapp/app.py` desde la raíz del proyecto.
 """
 
 import streamlit as st
@@ -51,17 +54,6 @@ with col4:
         default=["Naturaleza"],
     )
 
-# ---------- CONSTRUCCIÓN DEL PROMPT ----------
-interest_str = ", ".join(interests) if interests else "cualquier tipo de actividad"
-
-prompt_base = load_formatted_prompt(
-    "prompt_base",
-    days=days,
-    budget=budget.lower(),
-    travel_type=travel_type.lower(),
-    interests={interest_str},
-)
-
 # ---------- CÁLCULO Y VISUALIZACIÓN DE TOKENS ----------
 user_token_count = len(encoding.encode(user_query))
 tokens_remaining = max(MAX_PROMPT_TOKENS, 0)
@@ -75,8 +67,20 @@ st.progress(
     text=f"{user_token_count} / {tokens_remaining} tokens usados en tu mensaje",
 )
 
+# ---------- CONSTRUCCIÓN DEL PROMPT ----------
+interest_str = ", ".join(interests) if interests else "cualquier tipo de actividad"
+
 # Prompt completo con sistema + entrada del usuario
-full_prompt = prompt_base + user_query
+full_prompt = (
+    load_formatted_prompt(
+        "prompt_base",
+        days=days,
+        budget=budget.lower(),
+        travel_type=travel_type.lower(),
+        interests=interest_str,
+    )
+    + user_query
+)
 
 # ---------- BOTÓN Y LÓGICA DE GENERACIÓN ----------
 if st.button("🦘 Generar itinerario"):
@@ -92,7 +96,7 @@ if st.button("🦘 Generar itinerario"):
     else:
         with st.spinner("⛺ Trazando tu ruta ideal..."):
             try:
-                response = run_prompt(full_prompt)
+                response = run_prompt(full_prompt)["generated_response"]
                 st.success("🗺️ Tu itinerario personalizado:")
                 st.markdown(response, unsafe_allow_html=True)
             except Exception as e:

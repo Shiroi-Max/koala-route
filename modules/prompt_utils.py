@@ -96,33 +96,26 @@ def load_formatted_prompt(key: str, **kwargs) -> str:
 
 
 def extract_user_interests_from_prompt(
-    prompt_template: str, filled_prompt: str
+    filled_prompt: str
 ) -> list[str]:
     """
     Extrae los intereses del usuario desde un prompt ya formateado.
 
-    Esta función compara un template con marcadores (ej. `{interests}`) y su versión
-    ya rellenada, extrayendo el contenido que fue insertado dinámicamente en el campo `interests`.
+    Esta función busca el campo 'intereses' dentro del texto del prompt
+    y extrae su contenido hasta el primer punto, sin depender de una plantilla
+    o de sufijos como "Detalles adicionales".
 
     Args:
-        prompt_template (str): Plantilla del prompt, con el marcador `{interests}`.
-        filled_prompt (str): Prompt real con los datos ya sustituidos.
+        filled_prompt (str): Texto completo del prompt ya instanciado.
 
     Returns:
-        list[str]: Lista de intereses (minúsculas y sin espacios).
+        list[str]: Lista de intereses normalizados (en minúsculas y sin espacios sobrantes).
     """
-    # Escapar caracteres especiales del template para usarlo como regex
-    pattern = re.escape(prompt_template)
+    # Captura intereses hasta el primer punto tras ellos
+    pattern = r"intereses:\s*(?P<interests>.+?)\."
 
-    # Reemplazar {interests} por grupo de captura
-    pattern = pattern.replace(re.escape("{interests}"), r"(?P<interests>.+?)")
-
-    # Reemplazar otros marcadores como {days}, {budget}, etc. por comodines
-    pattern = re.sub(r"\{[^{}]+\}", r".+?", pattern)
-
-    # Buscar el contenido de interests dentro del prompt ya instanciado
-    match = re.search(pattern, filled_prompt, re.DOTALL)
+    match = re.search(pattern, filled_prompt, re.IGNORECASE | re.DOTALL)
     if match:
-        interests_str = match.group("interests")
+        interests_str = match.group("interests").strip()
         return [i.strip().lower() for i in interests_str.split(",") if i.strip()]
     return []

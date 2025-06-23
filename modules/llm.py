@@ -14,7 +14,7 @@ Expone:
 from openai import AzureOpenAI
 
 from config.config import (
-    API_VERSION,
+    API_VERSION_LLM,
     AZURE_OPENAI_API_KEY,
     AZURE_OPENAI_DEPLOYMENT,
     AZURE_OPENAI_ENDPOINT,
@@ -25,7 +25,7 @@ from config.config import (
 # Instancia del cliente de Azure OpenAI, configurado con credenciales del entorno
 client = AzureOpenAI(
     api_key=AZURE_OPENAI_API_KEY,
-    api_version=API_VERSION,
+    api_version=API_VERSION_LLM,
     azure_endpoint=AZURE_OPENAI_ENDPOINT,
 )
 
