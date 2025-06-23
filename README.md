@@ -84,13 +84,29 @@ AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT=<nombre-del-deployment-de-embeddings>
 
 ## 🧪 Uso
 
-### Ejecutar interfaz web con Streamlit
+### Ejecutar interfaz web principal (planificador de viajes)
 
 ```bash
 streamlit run webapp/app.py
 ```
 
-Permite planificar viajes con filtros, duración, presupuesto e intereses.
+Permite planificar viajes con filtros de duración, presupuesto e intereses, generando itinerarios personalizados.
+
+---
+
+### Ejecutar interfaz de evaluación de escenarios de prueba
+
+```bash
+streamlit run webapp/app_test.py
+```
+
+Permite seleccionar escenarios YAML predefinidos, ejecutar el sistema RAG y visualizar:
+
+- La respuesta generada por el modelo (itinerario).
+
+- Los documentos recuperados desde Azure Cognitive Search.
+
+- Métricas de evaluación como Recall adaptativo y Coherencia Semántica para comprobar el rendimiento del sistema.
 
 ---
 
