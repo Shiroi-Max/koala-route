@@ -11,7 +11,7 @@ Campos:
 - input (str): Entrada original del usuario.
 - response (str): Mensaje de respuesta generado o contexto recuperado (en formato ChatML o texto plano).
 - last_node (str): Último nodo ejecutado en el flujo (por ejemplo, "consulta" o "llm").
-- retrieved_docs (List[str]): Lista de identificadores de documentos relevantes recuperados,
+- retrieved_docs (List[dict]): Lista de documentos relevantes recuperados,
   con el formato "título#sección".
 """
 
@@ -27,11 +27,11 @@ class AgentState(TypedDict, total=False):
         input (str): Entrada del usuario.
         response (str | None): Respuesta generada o contexto recuperado.
         last_node (str | None): Nombre del último nodo ejecutado.
-        retrieved_docs (List[str] | None): Documentos relevantes recuperados en formato "título#sección".
+        retrieved_docs (List[dict] | None): Documentos relevantes recuperados".
     """
 
     input: str
     response: str = None
     last_node: str = None
-    retrieved_docs: List[str] = None
+    retrieved_docs: List[dict] = None
 

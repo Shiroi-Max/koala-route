@@ -92,4 +92,4 @@ else:
         if retrieved_docs:
             st.subheader("📚 Documentos recuperados")
             for doc in retrieved_docs:
-                st.markdown(f"- `{doc}`")
+                st.markdown(f"- `{doc.get('id')}`")

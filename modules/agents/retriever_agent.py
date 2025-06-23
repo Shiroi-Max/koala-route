@@ -108,10 +108,15 @@ class RetrieverAgent:
                 for doc in relevant:
                     title = doc.metadata.get("title", "Sin título")
                     section = doc.metadata.get("section", "Sin sección")
-                    content = doc.page_content.strip()
+                    categories = doc.metadata.get("category", [])
 
+                    content = doc.page_content.strip()
                     result_sections.append(f"## {title} > {section}\n\n{content}")
-                    retrieved_docs.append(f"{title}#{section}")
+
+                    retrieved_docs.append({
+                        "id": f"{title}#{section}",
+                        "category": categories,
+                    })
 
                 # Unimos las secciones en un solo bloque de texto
                 result = "\n\n".join(result_sections)

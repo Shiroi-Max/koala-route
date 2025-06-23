@@ -41,7 +41,7 @@ class Evaluator:
         """
         self.embeddings = embeddings
 
-    def recall_at_k(self, relevant_docs: Set[str], retrieved_docs: List[str]) -> float:
+    def recall_at_k(self, relevant_docs: Set[str], retrieved_docs: List[Dict]) -> float:
         """
         Calcula el recall adaptativo entre los documentos relevantes esperados y los recuperados.
 
@@ -50,16 +50,48 @@ class Evaluator:
 
         Args:
             relevant_docs (Set[str]): Conjunto de identificadores de documentos relevantes esperados.
-            retrieved_docs (List[str]): Lista de identificadores de documentos recuperados por el sistema.
+            retrieved_docs (List[Dict]): Lista de documentos recuperados por el sistema.
 
         Returns:
             float: Valor de recall@k, entre 0.0 y 1.0. Si no hay documentos relevantes, retorna 0.0.
         """
         k = max(1, ceil(K_EVAL_THRESHOLD * len(retrieved_docs)))
-        top_k = retrieved_docs[:k]
-        relevant_retrieved = sum(1 for doc in top_k if doc in relevant_docs)
+        top_k_ids = [doc["id"] for doc in retrieved_docs[:k]]
+        relevant_retrieved = sum(1 for doc_id in top_k_ids if doc_id in relevant_docs)
         total_relevant = len(relevant_docs)
         return relevant_retrieved / total_relevant if total_relevant > 0 else 0.0
+
+    def thematic_coverage(self, interests: List[str], retrieved_docs: List[Dict]) -> float:
+        """
+        Calcula la cobertura temática de los documentos recuperados respecto a los intereses del usuario.
+
+        Esta métrica evalúa qué proporción de los intereses proporcionados por el usuario
+        están presentes en las categorías de los documentos recuperados. Se normaliza todo el texto
+        a minúsculas para una comparación robusta.
+
+        Si no se especifican intereses, se asume cobertura total (1.0).
+
+        Args:
+            interests (List[str]): Lista de intereses definidos por el usuario.
+            retrieved_docs (List[Dict]): Lista de documentos recuperados, cada uno con una clave "category"
+                                        que contiene una lista de etiquetas temáticas.
+
+        Returns:
+            float: Porcentaje de intereses cubiertos por las categorías de los documentos (entre 0.0 y 1.0).
+        """
+        if not interests:
+            return 1.0
+
+        # Normalizar intereses y categorías
+        interests_normalized = {i.strip().lower() for i in interests}
+        retrieved_categories = set()
+
+        for doc in retrieved_docs:
+            for cat in doc.get("category", []):
+                retrieved_categories.add(cat.strip().lower())
+
+        matches = sum(1 for i in interests_normalized if i in retrieved_categories)
+        return matches / len(interests_normalized) if interests_normalized else 0.0
 
     def semantic_similarity(self, generated: str, reference: str) -> float:
         """
@@ -81,35 +113,40 @@ class Evaluator:
         """
         Evalúa un escenario de prueba comparando los resultados generados con los esperados.
 
-        Si `evaluate` es True, se evalúa tanto la recuperación como la generación.
-        Si es False, se omite la métrica de recuperación y generación.
+        Esta función calcula varias métricas para analizar la calidad de la recuperación y la generación:
+        - Recall adaptativo: porcentaje de documentos esperados que se encuentran entre los recuperados (ajustado por k dinámico).
+        - Cobertura Temática: proporción de intereses del usuario que están representados en las categorías de los documentos recuperados.
+        - Coherencia Semántica: similitud entre la respuesta generada y una respuesta de referencia.
+
+        La evaluación de recuperación solo se ejecuta si el campo `evaluate` está presente y es True.
 
         Args:
-            scenario (Dict): Diccionario con la información del escenario, incluyendo campos como:
-                - name
-                - generated_response
-                - reference_response
-                - retrieved_docs
-                - expected_relevant_docs
-                - evaluate (bool)
+            scenario (Dict): Diccionario con la información del escenario
 
         Returns:
-            Dict: Diccionario con las métricas obtenidas para el escenario, incluyendo:
-                - "Escenario": nombre del escenario.
-                - "Recall adaptativo": (opcional) resultado de la recuperación.
-                - "Coherencia Semántica": similitud entre la respuesta generada y la referencia.
+            Dict: Diccionario con las métricas obtenidas para el escenario.
         """
+
         results = {"Escenario": scenario["name"]}
 
         if scenario.get("evaluate", True):
+            # Métrica de recall adaptativo
             recall = self.recall_at_k(
                 set(scenario["expected_relevant_docs"]), scenario["retrieved_docs"]
             )
             results["Recall adaptativo"] = round(recall, 2)
 
-            coherence = self.semantic_similarity(
-                scenario["generated_response"], scenario["reference_response"]
+            # Métrica de cobertura temática
+            coverage = self.thematic_coverage(
+                scenario.get("interests", []), scenario["retrieved_docs"]
             )
-            results["Coherencia Semántica"] = round(coherence, 2)
+            results["Cobertura Temática"] = round(coverage, 2)
+
+            # Métrica de coherencia semántica
+            if "reference_response" in scenario and "generated_response" in scenario:
+                coherence = self.semantic_similarity(
+                    scenario["generated_response"], scenario["reference_response"]
+                )
+                results["Coherencia Semántica"] = round(coherence, 2)
 
         return results
