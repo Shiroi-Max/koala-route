@@ -38,9 +38,9 @@
   duration_days: 6
   user_input: "Queremos disfrutar de buena comida local y relajarnos en la playa. Preferiblemente en Gold Coast o alrededores."
   expected_relevant_docs:
-    - "Gold Coast#"
-    - "Gold Coast#"
-    - "Gold Coast#"
+    - "Gold Coast#Descripción General"
+    - "Gold Coast#Comida y Bebida"
+    - "Gold Coast#Clima"
   evaluate_retrieval_docs: true
 
 - name: Escenario 4 - Ruta de festivales en ciudades grandes (7 días)
@@ -53,9 +53,12 @@
   duration_days: 7
   user_input: "Planeamos asistir a eventos culturales importantes en ciudades como Sídney o Melbourne."
   expected_relevant_docs:
-    - "Sídney#"
-    - "Melbourne#"
-    - "Sídney#"
+    - "Sídney#Descripción General"
+    - "Sídney#Eventos y Festivales"
+    - "Sídney#Principales Atracciones"
+    - "Melbourne#Descripción General"
+    - "Melbourne#Eventos y Festivales"
+    - "Melbourne#Principales Atracciones"
   evaluate_retrieval_docs: true
 
 - name: Escenario 5 - Aventura ecológica en zonas poco turísticas (4 días)
