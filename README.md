@@ -4,6 +4,12 @@
   <img src="https://img.shields.io/badge/Powered%20by-Azure%20OpenAI%20%7C%20LangGraph%20%7C%20Streamlit-orange.svg" alt="powered by" />
 </p>
 
+<p align="center">
+  <a href="docs/TFM_Utica_Maxim.pdf" download>
+    <img src="https://img.shields.io/badge/📘%20Download%20TFM-TFM_Utica_Maxim.pdf-blue" alt="Download TFG"/>
+  </a>
+</p>
+
 # 🐨 Koala Route 🐨
 Este proyecto implementa un sistema de Recuperación y Generación Aumentada (RAG) que:
 
