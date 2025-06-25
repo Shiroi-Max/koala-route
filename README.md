@@ -6,61 +6,66 @@
 
 <p align="center">
   <a href="docs/TFM_Utica_Maxim.pdf" download>
-    <img src="https://img.shields.io/badge/📘%20Download%20TFM-TFM_Utica_Maxim.pdf-blue" alt="Download TFG"/>
+    <img src="https://img.shields.io/badge/📘%20Download%20TFM-TFM_Utica_Maxim.pdf-blue" alt="Download TFM"/>
   </a>
 </p>
 
 # 🐨 Koala Route 🐨
-Este proyecto implementa un sistema de Recuperación y Generación Aumentada (RAG) que:
 
-- Usa Azure Cognitive Search como almacén vectorial para realizar recuperación semántica eficiente. 
-- Utiliza Azure OpenAI (GPT-3.5-Turbo) para la generación de respuestas mediante LangGraph. 
-- Integra un orquestador de agentes con LangGraph para gestionar el flujo de recuperación y generación de manera modular.
-- Emplea un modelo de embedding de Azure OpenAI (text-embedding-3-large) para convertir documentos y consultas en vectores, garantizando compatibilidad total con el índice configurado en Azure Search.
-- Dispone de interfaz web con Streamlit para una interacción amigable y evaluación de escenarios de prueba.
-- Soporta gestión de tokens y límites de uso para optimizar el coste de las llamadas a la API.
-- Utiliza `.env` para una gestión segura y centralizada de credenciales y endpoints de Azure.
+This project implements a **Retrieval-Augmented Generation (RAG)** system that:
+
+- Uses Azure Cognitive Search as a vector store for efficient semantic retrieval.  
+- Employs Azure OpenAI (GPT-3.5-Turbo) for response generation via LangGraph.  
+- Integrates an agent orchestrator using LangGraph to modularly manage the retrieval and generation flow.  
+- Uses Azure OpenAI's `text-embedding-3-large` model to convert documents and queries into vectors, ensuring full compatibility with the configured Azure Search index.  
+- Provides a web interface built with Streamlit for user-friendly interaction and evaluation of test scenarios.  
+- Supports token usage management and quota limits to optimize API call costs.  
+- Uses `.env` for secure and centralized management of Azure credentials and endpoints.
 
 ---
 
-🧠 Project Overview
-Title: Generación Aumentada con LLMs y Orquestación Multiagente para Planificación de Viajes  
-Author: Maxim Utica Babyak  
-Degree: Máster Universitario en Inteligencia Artificial  
-University: Universidad Alfonso X El Sabio (UAX)  
-Date: Junio 2025  
-Language: Spanish  
+## 🧠 Project Overview
 
-Este proyecto implementa un sistema completo de recuperación semántica y generación de texto, evaluado bajo escenarios controlados, con enfoque en eficiencia, calidad de resultados y orquestación modular mediante agentes.
+**Title**: Retrieval-Augmented Generation with LLMs and Multi-Agent Orchestration for Travel Planning  
+**Author**: Maxim Utica Babyak  
+**Degree**: Master’s in Artificial Intelligence  
+**University**: Universidad Alfonso X El Sabio (UAX)  
+**Date**: June 2025  
+**Language**: Spanish  
 
-Puedes leer el TFM completo aquí:  
+This project implements a complete system for semantic retrieval and text generation, evaluated under controlled scenarios, with a focus on efficiency, result quality, and modular agent-based orchestration.
+
+You can read the full thesis here:  
 📘 [TFM_Utica_Maxim.pdf](docs/TFM_Utica_Maxim.pdf)
 
 ---
 
-## 🚀 Requisitos
+## 🚀 Requirements
 
 - Python **3.12**  
-- Dependencias gestionadas con `pyproject.toml`  
-- Archivo `.env` configurado con credenciales de Azure
+- Dependencies managed via `pyproject.toml`  
+- A `.env` file configured with Azure credentials
 
 ---
 
 ## 📸 Preview
+
 ![alt text](images/preview.png)
 
-## ⚡ Instalación
+---
 
-### 1. Crea y activa un entorno virtual
+## ⚡ Installation
 
-En Linux/macOS:
+### 1. Create and activate a virtual environment
+
+On Linux/macOS:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-En Windows:
+On Windows:
 
 ```bash
 python -m venv .venv
@@ -69,13 +74,13 @@ python -m venv .venv
 
 ---
 
-### 2. Instala las dependencias del proyecto
+### 2. Install project dependencies
 
 ```bash
 pip install .
 ```
 
-Si quieres también herramientas de desarrollo:
+If you also want development tools:
 
 ```bash
 pip install ".[dev]"
@@ -83,56 +88,55 @@ pip install ".[dev]"
 
 ---
 
-### 3. Crea y configura tu archivo .env
+### 3. Create and configure your `.env` file
 
 ```ini
 # 🔎 Azure Cognitive Search
-AZURE_SEARCH_ENDPOINT=https://<tu-endpoint>.search.windows.net
-AZURE_SEARCH_KEY=<tu-clave-secreta>
+AZURE_SEARCH_ENDPOINT=https://<your-endpoint>.search.windows.net
+AZURE_SEARCH_KEY=<your-secret-key>
 
-# 🤖 Azure OpenAI para generación
-AZURE_OPENAI_ENDPOINT=https://<tu-endpoint-openai>.openai.azure.com/
-AZURE_OPENAI_API_KEY=<tu-api-key>
-AZURE_OPENAI_DEPLOYMENT=<nombre-del-deployment-de-generación>
+# 🤖 Azure OpenAI for generation
+AZURE_OPENAI_ENDPOINT=https://<your-openai-endpoint>.openai.azure.com/
+AZURE_OPENAI_API_KEY=<your-api-key>
+AZURE_OPENAI_DEPLOYMENT=<your-generation-deployment-name>
 
-# 📐 Azure OpenAI para embeddings
-AZURE_OPENAI_EMBEDDINGS_ENDPOINT=https://<tu-endpoint-openai>.openai.azure.com/
-AZURE_OPENAI_EMBEDDINGS_API_KEY=<tu-api-key-embeddings>
-AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT=<nombre-del-deployment-de-embeddings>
+# 📐 Azure OpenAI for embeddings
+AZURE_OPENAI_EMBEDDINGS_ENDPOINT=https://<your-openai-endpoint>.openai.azure.com/
+AZURE_OPENAI_EMBEDDINGS_API_KEY=<your-embedding-api-key>
+AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT=<your-embedding-deployment-name>
 ```
 
 ---
 
-## 🧪 Uso
+## 🧪 Usage
 
-### Ejecutar interfaz web principal (planificador de viajes)
+### Launch main web interface (travel planner)
 
 ```bash
 streamlit run webapp/app.py
 ```
 
-Permite planificar viajes con filtros de duración, presupuesto e intereses, generando itinerarios personalizados.
+Allows planning trips with filters such as duration, budget, and interests, generating personalized itineraries.
 
 ---
 
-### Ejecutar interfaz de evaluación de escenarios de prueba
+### Launch test scenario evaluation interface
 
 ```bash
 streamlit run webapp/app_test.py
 ```
 
-Permite seleccionar escenarios YAML predefinidos, ejecutar el sistema RAG y visualizar:
+Allows selecting predefined YAML scenarios, running the RAG system, and visualizing:
 
-- La respuesta generada por el modelo (itinerario).
-
-- Los documentos recuperados desde Azure Cognitive Search.
-
-- Métricas de evaluación como Recall adaptativo y Coherencia Semántica para comprobar el rendimiento del sistema.
+- The model-generated response (itinerary).  
+- Documents retrieved from Azure Cognitive Search.  
+- Evaluation metrics such as Adaptive Recall and Semantic Coherence to assess system performance.
 
 ---
 
-### Subir documentos al índice Azure Cognitive Search
-Los documentos deben estar almacenados en ``DOCS_PATH``, constante definida en ``config.py``
+### Upload documents to Azure Cognitive Search index
+
+Documents must be stored in `DOCS_PATH`, a constant defined in `config.py`:
 
 ```bash
 python uploader.py --file info.md
@@ -144,45 +148,47 @@ python uploader.py --all
 
 ---
 
-### Eliminar documentos del índice de Azure Cognitive Search
+### Delete documents from Azure Cognitive Search index
+
 ```bash
-python deleter.py --id <id_documento> <id_documento_2> ...
+python deleter.py --id <document_id> <document_id_2> ...
 ```
 
 ```bash
 python deleter.py --all
 ```
+
 ---
 
-## 📂 Estructura del proyecto
+## 📂 Project Structure
 
 ```
 koalaRoute/
 ├── config/
 │   ├── config.py
-|   ├── prompts.yaml
-|   ├── test_cases.yaml
-|   └── ui_options.yaml
+│   ├── prompts.yaml
+│   ├── test_cases.yaml
+│   └── ui_options.yaml
 ├── data/
 │   └── template.md
 ├── modules/
 │   ├── agents/
-|   |   ├── controller_agent.py
-|   |   ├── llm_agent.py
-|   |   └── retriever_agent.py
+│   │   ├── controller_agent.py
+│   │   ├── llm_agent.py
+│   │   └── retriever_agent.py
 │   ├── graph/
-|   |   ├── agent_state.py
-|   |   └── graph.py
+│   │   ├── agent_state.py
+│   │   └── graph.py
 │   ├── llm.py
 │   ├── prompt_utils.py
 │   └── vector.py
 ├── webapp/
 │   ├── evaluations/
-|   |   ├── evaluator.py
-|   |   └── scenario_utils.py
+│   │   ├── evaluator.py
+│   │   └── scenario_utils.py
 │   ├── app_test.py
 │   ├── app.py
-|   └── runner.py
+│   └── runner.py
 ├── main.py
 ├── uploader.py
 ├── deleter.py
@@ -193,21 +199,21 @@ koalaRoute/
 
 ---
 
-## ✅ Estado
+## ✅ Status
 
-- Orquestación funcional con LangGraph, integrando Azure OpenAI (GPT-3.5-Turbo) y Azure Cognitive Search.
-- Embeddings gestionados desde Azure OpenAI, compatibles con el índice vectorial configurado en Azure Search.
-- Interfaz web en Streamlit con selección de escenarios de prueba, visualización de resultados y control de generación.
-- Evaluación automática de respuestas mediante métricas como Recall@k y coherencia semántica.
-- Gestión de tokens optimizada con tiktoken para prevenir sobrecostos en llamadas al modelo.
-- Variables sensibles y configuración externa gestionadas mediante `.env`.
-- Incluye scripts y documentación para subir, eliminar y administrar documentos en el índice vectorial.
+- Functional orchestration with LangGraph, integrating Azure OpenAI (GPT-3.5-Turbo) and Azure Cognitive Search.  
+- Embeddings managed via Azure OpenAI, compatible with the configured vector index.  
+- Streamlit web interface for scenario selection, result visualization, and generation control.  
+- Automatic response evaluation using metrics such as Recall@k and semantic coherence.  
+- Optimized token management with `tiktoken` to prevent overuse in model calls.  
+- Sensitive variables and external configuration managed through `.env`.  
+- Includes scripts and documentation for uploading, deleting, and managing documents in the vector index.
 
 ---
 
-## 📌 Notas
+## 📌 Notes
 
-- El sistema está preparado para cambiar fácilmente entre LLM local y Azure OpenAI.
-- Soporta extensiones para guardar itinerarios, historial, y futuras integraciones con FastAPI o Gradio.
-- Se recomienda usar entorno virtual y evitar instalar dependencias globalmente.
-- Ajusta límites de tokens y prompts para optimizar costos en Azure OpenAI.
+- The system is prepared to easily switch between local LLM and Azure OpenAI.  
+- Supports future extensions for itinerary saving, history tracking, and integration with FastAPI or Gradio.  
+- It is recommended to use a virtual environment and avoid installing dependencies globally.  
+- Adjust token limits and prompt sizes to optimize costs in Azure OpenAI.
