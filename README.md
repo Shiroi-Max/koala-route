@@ -23,6 +23,21 @@ Este proyecto implementa un sistema de Recuperación y Generación Aumentada (RA
 
 ---
 
+🧠 Project Overview
+Title: Generación Aumentada con LLMs y Orquestación Multiagente para Planificación de Viajes
+Author: Maxim Utica Babyak
+Degree: Máster Universitario en Inteligencia Artificial
+University: Universidad Alfonso X El Sabio (UAX)
+Date: Junio 2025
+Language: Spanish
+
+Este proyecto implementa un sistema completo de recuperación semántica y generación de texto, evaluado bajo escenarios controlados, con enfoque en eficiencia, calidad de resultados y orquestación modular mediante agentes.
+
+Puedes leer el TFM completo aquí:
+📘 [TFM_Utica_Maxim.pdf](docs/TFM_Utica_Maxim.pdf)
+
+---
+
 ## 🚀 Requisitos
 
 - Python **3.12**  
